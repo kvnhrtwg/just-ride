@@ -1,111 +1,102 @@
-import { createFileRoute, Link, redirect } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { convexQuery } from '@convex-dev/react-query'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
+import { useMutation as useConvexMutation } from 'convex/react'
+import { useState } from 'react'
 import { api } from '../../convex/_generated/api'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import { Button, buttonVariants } from '@/components/ui/button'
-import { authClient } from '@/lib/auth-client'
+import { Header } from '@/components/Header'
+import { MetricCards } from '@/components/MetricCards'
+import { useTrainerBluetooth } from '@/hooks/useTrainerBluetooth'
+import { ConnectionPanels } from '@/components/ConnectionPanels'
+import { ErgControlStrip } from '@/components/ErgControlStrip'
+import { StatusBar } from '@/components/StatusBar'
+
+const currentUserQuery = convexQuery(api.auth.getCurrentUser, {})
+const userDataQuery = convexQuery(api.userData.getCurrentUserData, {})
 
 export const Route = createFileRoute('/')({
   loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(
-      convexQuery(api.auth.getCurrentUser, {}),
-    )
+    await Promise.all([
+      context.queryClient.ensureQueryData(currentUserQuery),
+      context.queryClient.ensureQueryData(userDataQuery),
+    ])
   },
   component: Home,
 })
 
 function Home() {
-  const { data: user } = useSuspenseQuery(
-    convexQuery(api.auth.getCurrentUser, {}),
-  )
+  const queryClient = useQueryClient()
+  const setCurrentUserFtp = useConvexMutation(api.userData.setCurrentUserFtp)
+  const [isSavingFtp, setIsSavingFtp] = useState(false)
+  const { data: userData } = useSuspenseQuery(userDataQuery)
+  const model = useTrainerBluetooth({ initialErgTargetWatts: userData.ftp })
 
-  const handleSignOut = async () => {
-    await authClient.signOut({
-      fetchOptions: {
-        onSuccess: () => {
-          location.reload()
-        },
-      },
-    })
+  const {
+    webBluetoothSupported,
+    statusMessage,
+    connectionState,
+    heartRateConnectionState,
+    trainerName,
+    heartRateMonitorName,
+    livePowerWatts,
+    heartRateBpm,
+    ergTargetWatts,
+    setErgTargetWatts,
+    connectTrainer,
+    disconnectTrainer,
+    connectHeartRateMonitor,
+    disconnectHeartRateMonitor,
+    setErgTarget,
+  } = model
+
+  const handleSaveFtp = async (ftp: number) => {
+    setIsSavingFtp(true)
+    try {
+      await setCurrentUserFtp({ ftp })
+      setErgTargetWatts(ftp)
+      await queryClient.invalidateQueries({
+        queryKey: userDataQuery.queryKey,
+      })
+    } finally {
+      setIsSavingFtp(false)
+    }
   }
 
   return (
-    <main className="min-h-screen bg-background text-foreground">
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-6 py-16">
-        <header className="flex flex-col gap-2">
-          <p className="text-sm font-medium text-muted-foreground">
-            TanStack Start • shadcn/ui • Better Auth • Convex
-          </p>
-          <h1 className="text-3xl font-semibold tracking-tight">
-            Starter authentication flow
-          </h1>
-          <p className="text-muted-foreground">
-            Sign up, sign in, and see your authenticated session.
-          </p>
-        </header>
+    <main className="cp-page">
+      <div className="cp-shell">
+        <Header ftp={userData.ftp} onSaveFtp={handleSaveFtp} isSavingFtp={isSavingFtp} />
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Session</CardTitle>
-            <CardDescription>
-              {user
-                ? 'You are signed in and ready to build.'
-                : 'Create an account or sign in to continue.'}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {user ? (
-              <div className="space-y-2">
-                <p className="text-sm font-medium text-muted-foreground">
-                  Signed in as
-                </p>
-                <p className="text-lg font-semibold">
-                  {user.email ?? 'Unknown email'}
-                </p>
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                No active session found.
-              </p>
-            )}
-          </CardContent>
-          <CardFooter className="justify-between gap-3">
-            {user ? (
-              <Button onClick={handleSignOut}>Sign out</Button>
-            ) : (
-              <div className="flex flex-wrap gap-3">
-                <Link
-                  className={buttonVariants({ variant: 'default' })}
-                  to="/login"
-                >
-                  Log in
-                </Link>
-                <Link
-                  className={buttonVariants({ variant: 'outline' })}
-                  to="/signup"
-                >
-                  Create account
-                </Link>
-              </div>
-            )}
-            {!user ? (
-              <Link
-                className={buttonVariants({ variant: 'ghost' })}
-                to="/signup"
-              >
-                Need an account?
-              </Link>
-            ) : null}
-          </CardFooter>
-        </Card>
+        <MetricCards
+          livePowerWatts={livePowerWatts}
+          trainerName={trainerName}
+          connectionState={connectionState}
+          heartRateBpm={heartRateBpm}
+          heartRateMonitorName={heartRateMonitorName}
+          heartRateConnectionState={heartRateConnectionState}
+        />
+
+        <ConnectionPanels
+          webBluetoothSupported={webBluetoothSupported}
+          connectionState={connectionState}
+          heartRateConnectionState={heartRateConnectionState}
+          connectTrainer={connectTrainer}
+          disconnectTrainer={disconnectTrainer}
+          connectHeartRateMonitor={connectHeartRateMonitor}
+          disconnectHeartRateMonitor={disconnectHeartRateMonitor}
+        />
+
+        <ErgControlStrip
+          ergTargetWatts={ergTargetWatts}
+          setErgTargetWatts={setErgTargetWatts}
+          setErgTarget={setErgTarget}
+          connectionState={connectionState}
+        />
+
+        <StatusBar
+          connectionState={connectionState}
+          statusMessage={statusMessage}
+        />
       </div>
     </main>
   )

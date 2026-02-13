@@ -1,0 +1,43 @@
+.cp-status-bar {
+  margin-top: auto;
+  background: rgba(10, 0, 21, 0.88);
+  border: 1px solid rgba(176, 0, 255, 0.3);
+  padding: 0.55rem 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.cp-status-indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(176, 0, 255, 0.45);
+  flex-shrink: 0;
+}
+
+.cp-status-indicator--active {
+  background: var(--cp-accent-cyan);
+  box-shadow: 0 0 8px var(--cp-accent-cyan);
+  animation: cp-status-pulse 2s ease-in-out infinite;
+}
+
+@keyframes cp-status-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.cp-status-text {
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: var(--cp-text-secondary);
+  letter-spacing: 0.1em;
+  margin: 0;
+  line-height: 1.4;
+  text-shadow: 0 0 6px rgba(176, 0, 255, 0.2);
+}

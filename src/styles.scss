@@ -1,0 +1,305 @@
+@import url("https://fonts.googleapis.com/css2?family=Audiowide&family=Share+Tech+Mono&display=swap");
+
+$bg-base: #0a0015;
+$bg-grid: rgba(255, 45, 149, 0.08);
+$bg-glow: rgba(0, 240, 255, 0.22);
+$text-primary: #e0d4f5;
+$text-secondary: #aa98cf;
+$text-muted: #7a6a9a;
+$panel-bg: rgba(10, 0, 21, 0.82);
+$panel-border: rgba(176, 0, 255, 0.35);
+$accent-cyan: #00f0ff;
+$accent-pink: #ff2d95;
+$accent-purple: #b000ff;
+$accent-yellow: #ffe600;
+
+@mixin focus-ring($color) {
+  outline: none;
+  border-color: rgba($color, 0.7);
+  box-shadow: 0 0 0 2px rgba($color, 0.14), 0 0 18px rgba($color, 0.2);
+}
+
+:root {
+  font-family: "Share Tech Mono", monospace;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: dark;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --cp-text-primary: #{$text-primary};
+  --cp-text-secondary: #{$text-secondary};
+  --cp-text-muted: #{$text-muted};
+  --cp-bg-base: #{$bg-base};
+  --cp-panel-bg: #{$panel-bg};
+  --cp-panel-border: #{$panel-border};
+  --cp-accent-cyan: #{$accent-cyan};
+  --cp-accent-pink: #{$accent-pink};
+  --cp-accent-purple: #{$accent-purple};
+  --cp-accent-yellow: #{$accent-yellow};
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+.app-body {
+  margin: 0;
+  min-width: 320px;
+  color: $text-primary;
+  background:
+    linear-gradient($bg-grid 1px, transparent 1px),
+    linear-gradient(90deg, $bg-grid 1px, transparent 1px),
+    radial-gradient(circle at 15% -10%, $bg-glow, transparent 30%),
+    radial-gradient(circle at 85% 5%, rgba($accent-purple, 0.18), transparent 36%),
+    $bg-base;
+  background-size:
+    4px 4px,
+    4px 4px,
+    auto,
+    auto;
+}
+
+a {
+  color: inherit;
+}
+
+.cp-page {
+  min-height: 100vh;
+  margin: 0;
+  font-family: "Share Tech Mono", monospace;
+  color: $text-primary;
+  background-color: $bg-base;
+  background-image:
+    linear-gradient(rgba(255, 45, 149, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 45, 149, 0.08) 1px, transparent 1px);
+  background-size: 40px 40px;
+  position: relative;
+  overflow-x: hidden;
+
+  &::before {
+    content: "";
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.08) 2px,
+      rgba(0, 0, 0, 0.08) 4px
+    );
+    animation: cp-scanline-scroll 12s linear infinite;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 25% -10%, rgba(0, 240, 255, 0.22), transparent 40%),
+      radial-gradient(circle at 80% 8%, rgba(176, 0, 255, 0.18), transparent 34%),
+      radial-gradient(circle at 55% 100%, rgba(255, 45, 149, 0.12), transparent 40%);
+  }
+}
+
+@keyframes cp-scanline-scroll {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(100px);
+  }
+}
+
+.cp-shell {
+  position: relative;
+  z-index: 1;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 1rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.cp-page--auth {
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+}
+
+.cp-auth-shell {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 520px);
+  display: grid;
+  gap: 0.9rem;
+}
+
+.cp-auth-brand {
+  margin: 0;
+  font-family: "Audiowide", cursive;
+  font-size: clamp(0.9rem, 2.2vw, 1.15rem);
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: $accent-cyan;
+  text-align: center;
+  text-shadow:
+    0 0 12px rgba($accent-cyan, 0.45),
+    0 0 28px rgba($accent-pink, 0.24);
+}
+
+.cp-auth-card {
+  background: $panel-bg;
+  border: 1px solid $panel-border;
+  padding: clamp(1rem, 4vw, 1.5rem);
+  box-shadow:
+    0 0 0 1px rgba($accent-purple, 0.22) inset,
+    0 14px 40px rgba(0, 0, 0, 0.45),
+    0 0 24px rgba($accent-purple, 0.16);
+}
+
+.cp-auth-heading {
+  margin: 0 0 0.25rem;
+  font-family: "Audiowide", cursive;
+  font-size: clamp(1.3rem, 3.2vw, 1.7rem);
+  color: #f4eaff;
+  letter-spacing: 0.08em;
+}
+
+.cp-auth-subtitle {
+  margin: 0 0 1.2rem;
+  color: $text-secondary;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+}
+
+.cp-auth-form {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.cp-field {
+  display: grid;
+  gap: 0.35rem;
+
+  label {
+    color: $text-secondary;
+    text-transform: uppercase;
+    font-size: 0.55rem;
+    letter-spacing: 0.18em;
+    font-weight: 600;
+  }
+
+  input {
+    width: 100%;
+    border: 1px solid rgba($accent-purple, 0.55);
+    background: rgba(15, 3, 26, 0.9);
+    color: #f2e9ff;
+    font: inherit;
+    font-size: 0.9rem;
+    padding: 0.68rem 0.78rem;
+    transition: border-color 180ms ease, box-shadow 180ms ease;
+  }
+
+  input::placeholder {
+    color: $text-muted;
+  }
+
+  input:focus-visible {
+    @include focus-ring($accent-cyan);
+  }
+}
+
+.cp-auth-error {
+  margin: 0;
+  color: #ff6bb4;
+  font-size: 0.72rem;
+  letter-spacing: 0.07em;
+}
+
+.cp-auth-submit {
+  margin-top: 0.2rem;
+  width: 100%;
+  border: 1px solid rgba($accent-yellow, 0.62);
+  background: linear-gradient(135deg, rgba(255, 230, 0, 0.11), rgba(255, 45, 149, 0.14));
+  color: $accent-yellow;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-family: "Audiowide", cursive;
+  font-weight: 600;
+  font-size: 0.64rem;
+  padding: 0.72rem 0.95rem;
+  cursor: pointer;
+  transition:
+    transform 150ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease,
+    background-color 180ms ease;
+}
+
+.cp-auth-submit:hover:not(:disabled) {
+  border-color: rgba($accent-yellow, 0.9);
+  box-shadow:
+    0 0 12px rgba($accent-yellow, 0.35),
+    0 0 24px rgba($accent-pink, 0.2);
+  transform: translateY(-1px);
+}
+
+.cp-auth-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cp-auth-footer {
+  margin-top: 1rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem 1rem;
+  justify-content: space-between;
+}
+
+.cp-auth-link {
+  color: $accent-cyan;
+  text-transform: uppercase;
+  text-decoration: none;
+  font-size: 0.57rem;
+  letter-spacing: 0.14em;
+  transition: color 160ms ease, text-shadow 160ms ease;
+}
+
+.cp-auth-link:hover {
+  color: #76f6ff;
+  text-shadow:
+    0 0 10px rgba($accent-cyan, 0.45),
+    0 0 20px rgba($accent-pink, 0.25);
+}
+
+@media (max-width: 540px) {
+  .cp-auth-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cp-page::before {
+    animation: none;
+  }
+}

@@ -2,7 +2,6 @@
   "projectName": "start-app",
   "mode": "file-router",
   "typescript": true,
-  "tailwind": true,
   "packageManager": "pnpm",
   "addOnOptions": {},
   "git": true,

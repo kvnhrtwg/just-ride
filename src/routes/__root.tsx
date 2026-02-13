@@ -17,7 +17,7 @@ import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import { authClient } from '@/lib/auth-client'
 import { getToken } from '@/lib/auth-server'
-import appCss from '../styles.css?url'
+import appCss from '../styles.scss?url'
 
 const getAuth = createServerFn({ method: 'GET' }).handler(async () => {
   return await getToken()
@@ -97,7 +97,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <head>
         <HeadContent />
       </head>
-      <body className="min-h-screen bg-background text-foreground">
+      <body className="app-body">
         {children}
         <TanStackDevtools
           config={{
