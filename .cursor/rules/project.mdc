@@ -1,0 +1,28 @@
+---
+alwaysApply: true
+---
+
+# Project Stack
+
+This is a Tanstack Start project with the following stack:
+
+- Framework: Tanstack Start
+- UI: shadcn/ui with Base UI
+- Backend: Convex
+- Authentication: Better Auth
+
+Follow the conventions and patterns specific to these technologies when generating code.
+
+# MCP Servers
+
+When relevant to the task, utilize the connected MCP servers to:
+
+- Access external tools and data sources
+- Retrieve real-time information
+- Integrate with third-party services
+
+Always check if an MCP server can help accomplish the task before implementing custom solutions.
+
+# After implementation
+
+- If you changed .ts files, please run `bun typecheck` to see if you made any mistakes
