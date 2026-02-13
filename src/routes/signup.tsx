@@ -86,7 +86,11 @@ function SignupPage() {
 
             {error ? <p className="cp-auth-error">{error}</p> : null}
 
-            <button className="cp-auth-submit" type="submit" disabled={isSubmitting}>
+            <button
+              className="cp-auth-submit"
+              type="submit"
+              disabled={isSubmitting}
+            >
               {isSubmitting ? 'Creating account...' : 'Create account'}
             </button>
           </form>
