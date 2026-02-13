@@ -1,0 +1,202 @@
+.cp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+
+  h1 {
+    margin: 0;
+    font-family: "Audiowide", cursive;
+    font-size: 1rem;
+    font-weight: 400;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--cp-accent-cyan);
+    text-shadow:
+      0 0 0.75rem rgba(0, 240, 255, 0.45),
+      0 0 1.5rem rgba(255, 45, 149, 0.2);
+  }
+}
+
+.cp-settings-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  letter-spacing: 0.16em;
+  color: var(--cp-accent-cyan);
+  background: rgba(10, 0, 21, 0.9);
+  border: 1px solid rgba(176, 0, 255, 0.45);
+  padding: 0.5rem 0.75rem;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: rgba(0, 240, 255, 0.75);
+    box-shadow:
+      0 0 0.75rem rgba(0, 240, 255, 0.3),
+      0 0 1.5rem rgba(255, 45, 149, 0.15);
+  }
+}
+
+.cp-settings-popover {
+  position: fixed;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  border: 1px solid rgba(176, 0, 255, 0.5);
+  background: rgba(10, 0, 21, 0.98);
+  color: var(--cp-text-primary);
+  width: min(21.25rem, calc(100vw - 2rem));
+  padding: 1rem;
+  box-shadow:
+    0 0 0 1px rgba(176, 0, 255, 0.22) inset,
+    0 0.75rem 2rem rgba(0, 0, 0, 0.5),
+    0 0 1.25rem rgba(0, 240, 255, 0.2);
+
+  &:popover-open {
+    display: grid;
+    gap: 0.75rem;
+  }
+}
+
+.cp-settings-popover-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+
+  h2 {
+    margin: 0;
+    font-family: "Audiowide", cursive;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--cp-accent-cyan);
+  }
+}
+
+.cp-settings-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(176, 0, 255, 0.45);
+  background: rgba(15, 3, 26, 0.95);
+  color: var(--cp-text-secondary);
+  width: 1.75rem;
+  height: 1.75rem;
+  cursor: pointer;
+
+  &:hover {
+    border-color: rgba(0, 240, 255, 0.65);
+    color: var(--cp-accent-cyan);
+  }
+}
+
+.cp-settings-form {
+  display: grid;
+  gap: 0.5rem;
+
+  label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--cp-text-secondary);
+  }
+
+  input {
+    width: 100%;
+    border: 1px solid rgba(176, 0, 255, 0.55);
+    background: rgba(15, 3, 26, 0.9);
+    color: var(--cp-text-primary);
+    font: inherit;
+    font-size: 1rem;
+    padding: 0.5rem 0.75rem;
+
+    &:focus-visible {
+      outline: none;
+      border-color: rgba(0, 240, 255, 0.75);
+      box-shadow: 0 0 0 2px rgba(0, 240, 255, 0.14);
+    }
+  }
+}
+
+.cp-settings-actions {
+  display: block;
+}
+
+.cp-settings-save,
+.cp-settings-cancel {
+  border: 1px solid rgba(176, 0, 255, 0.45);
+  background: rgba(15, 3, 26, 0.95);
+  color: var(--cp-text-primary);
+}
+
+.cp-settings-save {
+  width: 100%;
+  border-color: rgba(0, 240, 255, 0.52);
+  color: var(--cp-accent-cyan);
+}
+
+.cp-settings-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 0.25rem 0;
+}
+
+.cp-settings-user {
+  display: grid;
+  gap: 0.5rem;
+
+  h3 {
+    margin: 0;
+    font-family: "Audiowide", cursive;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--cp-text-secondary);
+  }
+}
+
+.cp-settings-user-email {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--cp-text-primary);
+  word-break: break-word;
+}
+
+.cp-settings-signout {
+  width: 100%;
+  border: 1px solid rgba(255, 45, 149, 0.55);
+  background: rgba(22, 4, 30, 0.95);
+  color: #ff82c1;
+  transition: border-color 180ms ease, box-shadow 180ms ease, color 180ms ease;
+
+  &:hover:not(:disabled) {
+    border-color: rgba(255, 45, 149, 0.88);
+    box-shadow:
+      0 0 0.75rem rgba(255, 45, 149, 0.28),
+      0 0 1.25rem rgba(176, 0, 255, 0.18);
+    color: #ff9bcd;
+  }
+
+  &:focus-visible {
+    outline: none;
+    border-color: rgba(255, 45, 149, 0.88);
+    box-shadow: 0 0 0 2px rgba(255, 45, 149, 0.2);
+  }
+}
+
+.cp-settings-error,
+.cp-settings-success {
+  margin: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+}
+
+.cp-settings-error {
+  color: #ff6bb4;
+}
+
+.cp-settings-success {
+  color: var(--cp-accent-yellow);
+}

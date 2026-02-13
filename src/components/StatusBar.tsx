@@ -1,5 +1,5 @@
 import { ConnectionState } from "@/hooks/useTrainerBluetooth";
-import "./StatusBar.css";
+import "./StatusBar.scss";
 
 type StatusBarProps = {
   connectionState: ConnectionState;

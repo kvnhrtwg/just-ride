@@ -25,4 +25,4 @@ Always check if an MCP server can help accomplish the task before implementing c
 
 # After implementation
 
-- If you changed .ts files, please run `bun typecheck` to see if you made any mistakes
+- If you changed .ts or .tsx files, please run `bun typecheck` to see if you made any mistakes

@@ -1,5 +1,5 @@
 import { ConnectionState } from "@/hooks/useTrainerBluetooth";
-import "./MetricCards.css";
+import "./MetricCards.scss";
 
 type MetricCardsProps = {
   livePowerWatts: number | null;

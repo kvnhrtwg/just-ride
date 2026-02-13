@@ -28,6 +28,7 @@ function Home() {
   const queryClient = useQueryClient()
   const setCurrentUserFtp = useConvexMutation(api.userData.setCurrentUserFtp)
   const [isSavingFtp, setIsSavingFtp] = useState(false)
+  const { data: currentUser } = useSuspenseQuery(currentUserQuery)
   const { data: userData } = useSuspenseQuery(userDataQuery)
   const model = useTrainerBluetooth({ initialErgTargetWatts: userData.ftp })
 
@@ -65,7 +66,12 @@ function Home() {
   return (
     <main className="cp-page">
       <div className="cp-shell">
-        <Header ftp={userData.ftp} onSaveFtp={handleSaveFtp} isSavingFtp={isSavingFtp} />
+        <Header
+          ftp={userData.ftp}
+          userEmail={currentUser?.email ?? null}
+          onSaveFtp={handleSaveFtp}
+          isSavingFtp={isSavingFtp}
+        />
 
         <MetricCards
           livePowerWatts={livePowerWatts}

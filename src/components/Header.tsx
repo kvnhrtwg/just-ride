@@ -1,19 +1,23 @@
 import { Settings2, X } from 'lucide-react'
 import { type FormEvent, useEffect, useId, useRef, useState } from 'react'
-import './Header.css'
+import { authClient } from '@/lib/auth-client'
+import './Header.scss'
 
 type HeaderProps = {
   ftp: number
+  userEmail: string | null
   isSavingFtp: boolean
   onSaveFtp: (ftp: number) => Promise<void>
 }
 
-export function Header({ ftp, isSavingFtp, onSaveFtp }: HeaderProps) {
+export function Header({ ftp, userEmail, isSavingFtp, onSaveFtp }: HeaderProps) {
   const popoverId = useId()
   const popoverRef = useRef<HTMLDivElement | null>(null)
   const [ftpInput, setFtpInput] = useState(String(ftp))
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [signOutErrorMessage, setSignOutErrorMessage] = useState<string | null>(null)
+  const [isSigningOut, setIsSigningOut] = useState(false)
 
   useEffect(() => {
     setFtpInput(String(ftp))
@@ -44,6 +48,32 @@ export function Header({ ftp, isSavingFtp, onSaveFtp }: HeaderProps) {
           ? error.message
           : 'Unable to save FTP right now.'
       setErrorMessage(message)
+    }
+  }
+
+  const handleSignOut = async () => {
+    if (isSigningOut) return
+
+    setSignOutErrorMessage(null)
+    setIsSigningOut(true)
+
+    try {
+      const { error } = await authClient.signOut()
+      if (error) {
+        setSignOutErrorMessage(error.message ?? 'Unable to sign out right now.')
+        return
+      }
+
+      popoverRef.current?.hidePopover()
+      window.location.href = '/login'
+    } catch (error) {
+      const message =
+        error instanceof Error && error.message
+          ? error.message
+          : 'Unable to sign out right now.'
+      setSignOutErrorMessage(message)
+    } finally {
+      setIsSigningOut(false)
     }
   }
 
@@ -100,6 +130,22 @@ export function Header({ ftp, isSavingFtp, onSaveFtp }: HeaderProps) {
             </button>
           </div>
         </form>
+        <div className="cp-settings-divider" role="presentation" />
+        <section className="cp-settings-user" aria-labelledby={`${popoverId}-user`}>
+          <h3 id={`${popoverId}-user`}>User</h3>
+          <p className="cp-settings-user-email">{userEmail ?? 'Email unavailable'}</p>
+          {signOutErrorMessage ? (
+            <p className="cp-settings-error">{signOutErrorMessage}</p>
+          ) : null}
+          <button
+            type="button"
+            className="cp-settings-signout"
+            onClick={handleSignOut}
+            disabled={isSigningOut}
+          >
+            {isSigningOut ? 'Signing out...' : 'Sign out'}
+          </button>
+        </section>
       </div>
     </header>
   )

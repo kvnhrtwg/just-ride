@@ -1,0 +1,70 @@
+.cp-connections {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.cp-panel {
+  position: relative;
+  padding: 1rem;
+}
+
+.cp-panel-label {
+  display: block;
+  margin-bottom: 0.75rem;
+  color: var(--cp-text-secondary);
+  letter-spacing: 0.16em;
+}
+
+.cp-switch {
+  display: block;
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  letter-spacing: 0.1em;
+  padding: 0.5rem 1rem;
+  border: 2px solid;
+  transition: all 0.2s ease;
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+}
+
+.cp-switch--on {
+  background: rgba(0, 240, 255, 0.05);
+  color: var(--cp-accent-cyan);
+  border-color: var(--cp-accent-cyan);
+
+  &:hover:not(:disabled) {
+    background: rgba(0, 240, 255, 0.1);
+    border-color: var(--cp-accent-cyan);
+    box-shadow:
+      0 0 0.75rem rgba(0, 240, 255, 0.5),
+      0 0 2rem rgba(0, 240, 255, 0.2),
+      inset 0 0 0.75rem rgba(0, 240, 255, 0.12);
+  }
+}
+
+.cp-switch--off {
+  background: rgba(255, 45, 149, 0.05);
+  color: var(--cp-accent-pink);
+  border-color: var(--cp-accent-pink);
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 45, 149, 0.1);
+    border-color: var(--cp-accent-pink);
+    box-shadow:
+      0 0 0.75rem rgba(255, 45, 149, 0.5),
+      0 0 2rem rgba(255, 45, 149, 0.2),
+      inset 0 0 0.75rem rgba(255, 45, 149, 0.12);
+  }
+}
+
+@media (max-width: 48.75rem) {
+  .cp-connections {
+    grid-template-columns: 1fr;
+  }
+}

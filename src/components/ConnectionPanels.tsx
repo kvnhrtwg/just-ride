@@ -1,5 +1,5 @@
 import { type ConnectionState } from '@/hooks/useTrainerBluetooth'
-import './ConnectionPanels.css'
+import './ConnectionPanels.scss'
 
 type ConnectionPanelsProps = {
   webBluetoothSupported: boolean

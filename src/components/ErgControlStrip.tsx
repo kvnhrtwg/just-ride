@@ -1,5 +1,5 @@
 import { type ConnectionState } from "@/hooks/useTrainerBluetooth";
-import "./ErgControlStrip.css";
+import "./ErgControlStrip.scss";
 
 type ErgControlStripProps = {
   ergTargetWatts: number;
