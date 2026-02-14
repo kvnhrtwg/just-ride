@@ -175,29 +175,38 @@ export function useWorkoutExecution({
 
     const segment = activeWorkout.segments[activeSegmentIndex]
     const secondsIntoSegment = Math.max(0, elapsedSeconds - segment.startSecond)
-    const shouldDispatch = shouldDispatchErgUpdate({
+    const dispatchSecond = getDispatchSecond({
       segment,
       secondsIntoSegment,
       rampUpdateIntervalSeconds,
     })
-
-    if (!shouldDispatch) {
+    if (dispatchSecond === null) {
       return
     }
 
     const nextTarget = getSegmentTargetWatts({
       segment,
-      secondsIntoSegment,
+      secondsIntoSegment: dispatchSecond,
       ftp,
     })
     setCurrentTargetWatts(nextTarget)
+
+    const isScheduledDispatch = dispatchSecond === secondsIntoSegment
+    const needsRetry = lastSentTargetRef.current !== nextTarget
+    if (!isScheduledDispatch && !needsRetry) {
+      return
+    }
 
     if (lastSentTargetRef.current === nextTarget) {
       return
     }
 
-    lastSentTargetRef.current = nextTarget
-    void setErgTargetValue(nextTarget, { announce: false })
+    void (async () => {
+      const sent = await setErgTargetValue(nextTarget, { announce: false })
+      if (sent) {
+        lastSentTargetRef.current = nextTarget
+      }
+    })()
   }, [
     activeSegmentIndex,
     activeWorkout,
@@ -289,7 +298,7 @@ function getSegmentIndexForElapsed(
   return -1
 }
 
-function shouldDispatchErgUpdate({
+function getDispatchSecond({
   segment,
   secondsIntoSegment,
   rampUpdateIntervalSeconds,
@@ -297,20 +306,27 @@ function shouldDispatchErgUpdate({
   segment: WorkoutSegment
   secondsIntoSegment: number
   rampUpdateIntervalSeconds: number
-}): boolean {
+}): number | null {
+  if (segment.durationSeconds <= 0) {
+    return null
+  }
+
   if (secondsIntoSegment === 0) {
-    return true
+    return 0
   }
 
   const isRamp = segment.kind === 'ramp' && segment.ftpLow !== segment.ftpHigh
   if (!isRamp) {
-    return false
+    return 0
   }
 
   const rampInterval = Math.max(1, Math.round(rampUpdateIntervalSeconds))
-  const isRampStepBoundary = secondsIntoSegment % rampInterval === 0
-  const isSegmentEnd = secondsIntoSegment >= segment.durationSeconds - 1
-  return isRampStepBoundary || isSegmentEnd
+  const segmentEndSecond = Math.max(0, segment.durationSeconds - 1)
+  if (secondsIntoSegment >= segmentEndSecond) {
+    return segmentEndSecond
+  }
+
+  return Math.floor(secondsIntoSegment / rampInterval) * rampInterval
 }
 
 function getSegmentTargetWatts({
