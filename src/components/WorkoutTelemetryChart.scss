@@ -4,6 +4,7 @@
   display: grid;
   gap: v.$cp-space-3;
   padding: v.$cp-space-3;
+  background: rgba(v.$cp-white, 0.05);
   flex: 1;
 }
 

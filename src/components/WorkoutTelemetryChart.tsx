@@ -134,6 +134,11 @@ export function WorkoutTelemetryChart({
       normalized: true,
       animation: false,
       events: [],
+      layout: {
+        padding: {
+          left: 8,
+        },
+      },
       interaction: {
         mode: 'nearest',
         intersect: false,
@@ -185,6 +190,8 @@ export function WorkoutTelemetryChart({
           ticks: {
             color: palette.text,
             maxTicksLimit: 4,
+            crossAlign: 'far',
+            padding: 12,
           },
           grid: {
             display: false,
@@ -197,7 +204,7 @@ export function WorkoutTelemetryChart({
   )
 
   return (
-    <section className="cp-workout-telemetry cp-panel" aria-label="Live telemetry chart">
+    <section className="cp-workout-telemetry" aria-label="Live telemetry chart">
       {visibleSamples.length > 0 ? (
         <div className="cp-workout-telemetry-canvas">
           <Line data={chartData} options={chartOptions} />

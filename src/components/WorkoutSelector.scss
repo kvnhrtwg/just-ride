@@ -48,7 +48,7 @@
 
 .cp-workout-list {
   display: grid;
-  gap: v.$cp-space-4;
+  gap: v.$cp-space-8;
 }
 
 .cp-workout-card {
@@ -71,8 +71,8 @@
   }
 
   p {
-    color: var(--cp-accent-yellow);
     letter-spacing: 0.1em;
+    font-weight: 600;
   }
 }
 
