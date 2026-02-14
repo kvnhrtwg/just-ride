@@ -1,15 +1,17 @@
-import { Bluetooth, User, X } from 'lucide-react'
+import { Bluetooth, User } from 'lucide-react'
 import { type FormEvent, useEffect, useId, useRef, useState } from 'react'
 import { ConnectionPanels } from '@/components/ConnectionPanels'
+import { Popover } from '@/components/Popover'
 import { type ConnectionState } from '@/hooks/useTrainerBluetooth'
 import { authClient } from '@/lib/auth-client'
 import './Header.scss'
 
 type HeaderProps = {
   ftp: number
+  weightKg: number
   userEmail: string | null
-  isSavingFtp: boolean
-  onSaveFtp: (ftp: number) => Promise<void>
+  isSavingUserData: boolean
+  onSaveUserData: (userData: { ftp: number; weightKg: number }) => Promise<void>
   webBluetoothSupported: boolean
   statusMessage: string
   connectionState: ConnectionState
@@ -22,9 +24,10 @@ type HeaderProps = {
 
 export function Header({
   ftp,
+  weightKg,
   userEmail,
-  isSavingFtp,
-  onSaveFtp,
+  isSavingUserData,
+  onSaveUserData,
   webBluetoothSupported,
   statusMessage,
   connectionState,
@@ -38,6 +41,7 @@ export function Header({
   const devicesPopoverId = useId()
   const userPopoverRef = useRef<HTMLDivElement | null>(null)
   const [ftpInput, setFtpInput] = useState(String(ftp))
+  const [weightInput, setWeightInput] = useState(String(weightKg))
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [signOutErrorMessage, setSignOutErrorMessage] = useState<string | null>(null)
@@ -45,32 +49,48 @@ export function Header({
 
   useEffect(() => {
     setFtpInput(String(ftp))
+    setWeightInput(String(weightKg))
     setErrorMessage(null)
     setSuccessMessage(null)
-  }, [ftp])
+  }, [ftp, weightKg])
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setErrorMessage(null)
     setSuccessMessage(null)
 
-    const parsedValue = Number(ftpInput)
-    const normalizedValue = Math.round(parsedValue)
+    const parsedFtp = Number(ftpInput)
+    const normalizedFtp = Math.round(parsedFtp)
 
-    if (!Number.isFinite(normalizedValue) || normalizedValue < 1 || normalizedValue > 2000) {
+    if (!Number.isFinite(normalizedFtp) || normalizedFtp < 1 || normalizedFtp > 2000) {
       setErrorMessage('Enter an FTP between 1 and 2000.')
       return
     }
 
+    const parsedWeightKg = Number(weightInput)
+    const normalizedWeightKg = Math.round(parsedWeightKg * 10) / 10
+
+    if (
+      !Number.isFinite(normalizedWeightKg) ||
+      normalizedWeightKg < 20 ||
+      normalizedWeightKg > 300
+    ) {
+      setErrorMessage('Enter a weight between 20 and 300 kg.')
+      return
+    }
+
     try {
-      await onSaveFtp(normalizedValue)
-      setSuccessMessage('FTP saved.')
+      await onSaveUserData({
+        ftp: normalizedFtp,
+        weightKg: normalizedWeightKg,
+      })
+      setSuccessMessage('Settings saved.')
       userPopoverRef.current?.hidePopover()
     } catch (error) {
       const message =
         error instanceof Error && error.message
           ? error.message
-          : 'Unable to save FTP right now.'
+          : 'Unable to save settings right now.'
       setErrorMessage(message)
     }
   }
@@ -103,11 +123,11 @@ export function Header({
 
   return (
     <header className="cp-header">
-      <h1>Just Ride</h1>
+      <h1>NEOON</h1>
       <div className="cp-header-actions">
         <button
           type="button"
-          className="cp-settings-trigger"
+          className="cp-btn cp-settings-trigger"
           popoverTarget={devicesPopoverId}
           popoverTargetAction="toggle"
           aria-label="Open devices"
@@ -118,7 +138,7 @@ export function Header({
         </button>
         <button
           type="button"
-          className="cp-settings-trigger"
+          className="cp-btn cp-settings-trigger"
           popoverTarget={userPopoverId}
           popoverTargetAction="toggle"
           aria-label="Open user settings"
@@ -128,25 +148,13 @@ export function Header({
           <span>User</span>
         </button>
       </div>
-      <div
+      <Popover
         id={devicesPopoverId}
-        popover="auto"
+        title="Devices"
+        closeLabel="Close devices"
         className="cp-devices-popover"
-        role="dialog"
-        aria-labelledby={`${devicesPopoverId}-title`}
+        size="wide"
       >
-        <div className="cp-settings-popover-header">
-          <h2 id={`${devicesPopoverId}-title`}>Devices</h2>
-          <button
-            type="button"
-            className="cp-settings-close"
-            popoverTarget={devicesPopoverId}
-            popoverTargetAction="hide"
-            aria-label="Close devices"
-          >
-            <X size={14} aria-hidden="true" />
-          </button>
-        </div>
         {!webBluetoothSupported ? (
           <p className="cp-devices-unsupported">
             Web Bluetooth is not supported in this browser.
@@ -162,27 +170,14 @@ export function Header({
           disconnectHeartRateMonitor={disconnectHeartRateMonitor}
         />
         <p className="cp-devices-status">{statusMessage}</p>
-      </div>
-      <div
+      </Popover>
+      <Popover
         id={userPopoverId}
         ref={userPopoverRef}
-        popover="auto"
+        title="User"
+        closeLabel="Close user settings"
         className="cp-settings-popover"
-        role="dialog"
-        aria-labelledby={`${userPopoverId}-title`}
       >
-        <div className="cp-settings-popover-header">
-          <h2 id={`${userPopoverId}-title`}>User</h2>
-          <button
-            type="button"
-            className="cp-settings-close"
-            popoverTarget={userPopoverId}
-            popoverTargetAction="hide"
-            aria-label="Close user settings"
-          >
-            <X size={14} aria-hidden="true" />
-          </button>
-        </div>
         <form className="cp-settings-form" onSubmit={handleSubmit}>
           <label htmlFor={`${userPopoverId}-ftp`}>FTP</label>
           <input
@@ -194,11 +189,25 @@ export function Header({
             value={ftpInput}
             onChange={(event) => setFtpInput(event.target.value)}
           />
+          <label htmlFor={`${userPopoverId}-weight`}>Weight (kg)</label>
+          <input
+            id={`${userPopoverId}-weight`}
+            type="number"
+            min={20}
+            max={300}
+            step={0.1}
+            value={weightInput}
+            onChange={(event) => setWeightInput(event.target.value)}
+          />
           {errorMessage ? <p className="cp-settings-error">{errorMessage}</p> : null}
           {successMessage ? <p className="cp-settings-success">{successMessage}</p> : null}
           <div className="cp-settings-actions">
-            <button type="submit" className="cp-settings-save" disabled={isSavingFtp}>
-              {isSavingFtp ? 'Saving...' : 'Save FTP'}
+            <button
+              type="submit"
+              className="cp-btn cp-settings-save"
+              disabled={isSavingUserData}
+            >
+              {isSavingUserData ? 'Saving...' : 'Save settings'}
             </button>
           </div>
         </form>
@@ -211,14 +220,14 @@ export function Header({
           ) : null}
           <button
             type="button"
-            className="cp-settings-signout"
+            className="cp-btn cp-btn-danger cp-settings-signout"
             onClick={handleSignOut}
             disabled={isSigningOut}
           >
             {isSigningOut ? 'Signing out...' : 'Sign out'}
           </button>
         </section>
-      </div>
+      </Popover>
     </header>
   )
 }

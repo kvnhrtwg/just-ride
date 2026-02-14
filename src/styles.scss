@@ -1,5 +1,7 @@
 @use './variables' as v;
-@import url("https://fonts.googleapis.com/css2?family=Audiowide&family=Share+Tech+Mono&display=swap");
+@import url(
+  'https://fonts.googleapis.com/css2?family=Audiowide&family=Noto+Sans+Mono:wght@400;600;700&display=swap'
+);
 
 :root {
   font-family: v.$cp-font-mono;
@@ -47,7 +49,11 @@ p {
     linear-gradient(v.$cp-bg-grid 1px, transparent 1px),
     linear-gradient(90deg, v.$cp-bg-grid 1px, transparent 1px),
     radial-gradient(circle at 15% -10%, v.$cp-bg-glow, transparent 30%),
-    radial-gradient(circle at 85% 5%, rgba(v.$cp-accent-purple, 0.18), transparent 36%),
+    radial-gradient(
+      circle at 85% 5%,
+      rgba(v.$cp-accent-purple, 0.18),
+      transparent 36%
+    ),
     v.$cp-bg-base;
   background-size:
     0.25rem 0.25rem,
@@ -96,6 +102,39 @@ a {
   cursor: pointer;
 }
 
+.cp-btn {
+  border: v.$cp-border-thin solid rgba(v.$cp-white, 0.52);
+  background: v.$cp-surface-action;
+  color: v.$cp-text-heading;
+  transition: v.$cp-transition-panel;
+
+  &:hover:not(:disabled) {
+    border-color: rgba(v.$cp-white, 0.75);
+    box-shadow:
+      0 0 0.75rem rgba(v.$cp-white, 0.32),
+      0 0 1.5rem rgba(v.$cp-white, 0.14);
+  }
+}
+
+.cp-btn-danger {
+  border-color: rgba(v.$cp-accent-pink, 0.62);
+  background: rgba(v.$cp-accent-pink, 0.12);
+  color: v.$cp-accent-pink;
+
+  &:hover:not(:disabled) {
+    border-color: rgba(v.$cp-accent-pink, 0.9);
+    box-shadow:
+      0 0 0.75rem rgba(v.$cp-accent-pink, 0.35),
+      0 0 1.25rem rgba(v.$cp-accent-pink, 0.2);
+    color: v.$cp-accent-pink;
+  }
+
+  &:focus-visible {
+    @include v.cp-focus-ring(v.$cp-accent-pink);
+    border-color: rgba(v.$cp-accent-pink, 0.9);
+  }
+}
+
 .cp-settings-save:disabled,
 .cp-settings-signout:disabled {
   opacity: 0.55;
@@ -116,14 +155,26 @@ a {
   overflow-x: hidden;
 
   &::after {
-    content: "";
+    content: '';
     position: absolute;
     inset: 0;
     pointer-events: none;
     background:
-      radial-gradient(circle at 25% -10%, rgba(v.$cp-accent-cyan, 0.22), transparent 40%),
-      radial-gradient(circle at 80% 8%, rgba(v.$cp-accent-purple, 0.18), transparent 34%),
-      radial-gradient(circle at 55% 100%, rgba(v.$cp-accent-pink, 0.12), transparent 40%);
+      radial-gradient(
+        circle at 25% -10%,
+        rgba(v.$cp-accent-cyan, 0.22),
+        transparent 40%
+      ),
+      radial-gradient(
+        circle at 80% 8%,
+        rgba(v.$cp-accent-purple, 0.18),
+        transparent 34%
+      ),
+      radial-gradient(
+        circle at 55% 100%,
+        rgba(v.$cp-accent-pink, 0.12),
+        transparent 40%
+      );
   }
 }
 .cp-shell {
@@ -131,7 +182,7 @@ a {
   z-index: 1;
   max-width: 68.75rem;
   margin: 0 auto;
-  padding: 1.5rem 1.25rem 1rem;
+  padding: 1.5rem 1.25rem 2rem;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -213,7 +264,9 @@ a {
     font: inherit;
     font-size: 1rem;
     padding: 0.75rem 0.75rem;
-    transition: border-color 180ms ease, box-shadow 180ms ease;
+    transition:
+      border-color 180ms ease,
+      box-shadow 180ms ease;
   }
 
   input::placeholder {
@@ -235,9 +288,6 @@ a {
 .cp-auth-submit {
   margin-top: 0.25rem;
   width: 100%;
-  border: v.$cp-border-thin solid rgba(v.$cp-accent-yellow, 0.62);
-  background: linear-gradient(135deg, rgba(v.$cp-accent-yellow, 0.11), rgba(v.$cp-accent-pink, 0.14));
-  color: v.$cp-accent-yellow;
   text-transform: uppercase;
   letter-spacing: 0.16em;
   font-family: v.$cp-font-display;
@@ -246,18 +296,9 @@ a {
   padding: 0.75rem 1rem;
   cursor: pointer;
   transition:
-    transform 150ms ease,
     box-shadow 180ms ease,
     border-color 180ms ease,
     background-color 180ms ease;
-}
-
-.cp-auth-submit:hover:not(:disabled) {
-  border-color: rgba(v.$cp-accent-yellow, 0.9);
-  box-shadow:
-    0 0 0.75rem rgba(v.$cp-accent-yellow, 0.35),
-    0 0 1.5rem rgba(v.$cp-accent-pink, 0.2);
-  transform: translateY(-1px);
 }
 
 .cp-auth-submit:disabled {
@@ -281,7 +322,9 @@ a {
   text-decoration: none;
   font-size: 0.75rem;
   letter-spacing: 0.14em;
-  transition: color 160ms ease, text-shadow 160ms ease;
+  transition:
+    color 160ms ease,
+    text-shadow 160ms ease;
 }
 
 .cp-auth-link:hover {
@@ -289,6 +332,16 @@ a {
   text-shadow:
     0 0 0.75rem rgba(v.$cp-accent-cyan, 0.45),
     0 0 1.25rem rgba(v.$cp-accent-pink, 0.25);
+}
+
+.cp-placeholder {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: v.$cp-surface-action;
+  border: v.$cp-border-thin solid rgba(v.$cp-white, 0.52);
+  padding: v.$cp-space-2 v.$cp-space-3;
 }
 
 @media (max-width: 33.75rem) {

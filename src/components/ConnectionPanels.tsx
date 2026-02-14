@@ -26,14 +26,14 @@ export function ConnectionPanels({
         <span className="cp-panel-label">Trainer Control</span>
         {connectionState === 'connected' ? (
           <button
-            className="cp-switch cp-switch--off"
+            className="cp-btn cp-switch cp-switch--off"
             onClick={disconnectTrainer}
           >
             Disconnect Trainer
           </button>
         ) : (
           <button
-            className="cp-switch cp-switch--on"
+            className="cp-btn cp-switch cp-switch--on"
             onClick={connectTrainer}
             disabled={
               !webBluetoothSupported || connectionState === 'connecting'
@@ -50,14 +50,14 @@ export function ConnectionPanels({
         <span className="cp-panel-label">Heart Rate Monitor</span>
         {heartRateConnectionState === 'connected' ? (
           <button
-            className="cp-switch cp-switch--off"
+            className="cp-btn cp-switch cp-switch--off"
             onClick={disconnectHeartRateMonitor}
           >
             Disconnect HR Monitor
           </button>
         ) : (
           <button
-            className="cp-switch cp-switch--on"
+            className="cp-btn cp-switch cp-switch--on"
             onClick={connectHeartRateMonitor}
             disabled={
               !webBluetoothSupported ||

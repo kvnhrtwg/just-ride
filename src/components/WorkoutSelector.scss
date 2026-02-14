@@ -12,20 +12,8 @@
   text-transform: uppercase;
   font-family: v.$cp-font-display;
   font-size: 0.75rem;
-  color: var(--cp-accent-cyan);
-  border: v.$cp-border-thin solid rgba(v.$cp-white, 0.52);
-  background: v.$cp-surface-input;
   padding: v.$cp-space-2 v.$cp-space-3;
   cursor: pointer;
-  transition: border-color v.$cp-transition-fast, box-shadow v.$cp-transition-fast, color v.$cp-transition-fast;
-
-  &:hover {
-    border-color: rgba(v.$cp-white, 0.8);
-    color: v.$cp-text-cyan-bright;
-    box-shadow:
-      0 0 0.75rem rgba(v.$cp-accent-cyan, 0.26),
-      0 0 1.5rem rgba(v.$cp-accent-purple, 0.15);
-  }
 }
 
 .cp-workout-panel {
@@ -43,22 +31,19 @@
 }
 
 .cp-workout-level {
-  border: v.$cp-border-thin solid rgba(v.$cp-white, 0.34);
-  background: rgba(v.$cp-bg-base, 0.9);
-  color: var(--cp-text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.12em;
   font-family: v.$cp-font-display;
   font-size: 0.75rem;
   padding: v.$cp-space-2 v.$cp-space-3;
   cursor: pointer;
-  transition: border-color v.$cp-transition-fast, box-shadow v.$cp-transition-fast, color v.$cp-transition-fast;
 }
 
 .cp-workout-level--active {
-  border-color: rgba(v.$cp-white, 0.62);
-  color: var(--cp-accent-yellow);
-  box-shadow: 0 0 0.75rem rgba(v.$cp-accent-yellow, 0.2);
+  border-color: rgba(v.$cp-white, 0.75);
+  box-shadow:
+    0 0 0.75rem rgba(v.$cp-white, 0.32),
+    0 0 1.5rem rgba(v.$cp-white, 0.14);
 }
 
 .cp-workout-list {
@@ -82,7 +67,7 @@
     margin: 0;
     font-size: 1rem;
     letter-spacing: 0.03em;
-    color: v.$cp-text-bright;
+    color: v.$cp-text-heading;
   }
 
   p {
@@ -103,9 +88,6 @@
 }
 
 .cp-workout-action {
-  border: v.$cp-border-thin solid rgba(v.$cp-white, 0.34);
-  background: v.$cp-surface-input;
-  color: v.$cp-text-bright;
   font-family: v.$cp-font-display;
   font-size: 0.75rem;
   text-transform: uppercase;
@@ -127,12 +109,12 @@
 
 .cp-workout-action--detail {
   border-color: rgba(v.$cp-white, 0.52);
-  color: var(--cp-accent-cyan);
+  color: v.$cp-text-heading;
 }
 
 .cp-workout-action--start {
   border-color: rgba(v.$cp-white, 0.52);
-  color: var(--cp-accent-yellow);
+  color: v.$cp-text-heading;
 }
 
 .cp-workout-empty {

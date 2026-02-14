@@ -2,30 +2,35 @@ import { createFileRoute } from '@tanstack/react-router'
 import { convexQuery } from '@convex-dev/react-query'
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { useAction, useMutation as useConvexMutation } from 'convex/react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { api } from '../../convex/_generated/api'
 import type { Id } from '../../convex/_generated/dataModel'
 import type { WorkoutExecutionSample } from '@/hooks/useWorkoutExecution'
 import type { WorkoutDefinition } from '@/workouts/catalog'
 import { Header } from '@/components/Header'
-import { MetricCards } from '@/components/MetricCards'
+import { WorkoutLiveStrip } from '@/components/WorkoutLiveStrip'
 import { useWorkoutDataSource } from '@/hooks/useWorkoutDataSource'
 import { useTrainerBluetooth } from '@/hooks/useTrainerBluetooth'
 import { WorkoutSelector } from '@/components/WorkoutSelector'
 import { WorkoutProgress } from '@/components/WorkoutProgress'
+import { WorkoutBlockSidebar } from '@/components/WorkoutBlockSidebar'
+import { WorkoutTelemetryChart } from '@/components/WorkoutTelemetryChart'
 import { useWorkoutExecution } from '@/hooks/useWorkoutExecution'
+import './index.scss'
 
 const currentUserQuery = convexQuery(api.auth.getCurrentUser, {})
 const userDataQuery = convexQuery(api.userData.getCurrentUserData, {})
 const workoutSampleChunkSize = 60
 const FAKE_WORKOUT_ALLOWED_EMAIL = 'kvnhrtwg@gmail.com'
+const DEFAULT_WORKOUT_INTENSITY_PERCENT = 100
+const MIN_WORKOUT_INTENSITY_PERCENT = 50
+const MAX_WORKOUT_INTENSITY_PERCENT = 150
 
 type RecorderSample = {
   timestampMs: number
   elapsedSeconds: number
   segmentId: string | null
   segmentIndex: number
-  targetWatts: number | null
   powerWatts: number | null
   cadenceRpm: number | null
   heartRateBpm: number | null
@@ -44,6 +49,7 @@ type CurrentUserResult = {
 
 type UserDataResult = {
   ftp: number
+  weightKg: number
 }
 
 export const Route = createFileRoute('/')({
@@ -59,21 +65,42 @@ export const Route = createFileRoute('/')({
 function Home() {
   const queryClient = useQueryClient()
   const setCurrentUserFtp = useConvexMutation(api.userData.setCurrentUserFtp)
-  const startWorkoutSession = useConvexMutation(api.workouts.startWorkoutSession)
-  const appendWorkoutSampleChunk = useConvexMutation(api.workouts.appendWorkoutSampleChunk)
-  const finalizeWorkoutSession = useConvexMutation(api.workouts.finalizeWorkoutSession)
-  const discardWorkoutSession = useConvexMutation(api.workouts.discardWorkoutSession)
-  const generateWorkoutFitDownload = useAction(api.workoutExports.generateWorkoutFitDownload)
-  const [isSavingFtp, setIsSavingFtp] = useState(false)
-  const [pendingWorkoutStart, setPendingWorkoutStart] = useState<WorkoutDefinition | null>(null)
-  const [activeSessionId, setActiveSessionId] = useState<Id<'workoutSessions'> | null>(null)
-  const [completedSessionId, setCompletedSessionId] = useState<Id<'workoutSessions'> | null>(null)
+  const startWorkoutSession = useConvexMutation(
+    api.workouts.startWorkoutSession,
+  )
+  const appendWorkoutSampleChunk = useConvexMutation(
+    api.workouts.appendWorkoutSampleChunk,
+  )
+  const finalizeWorkoutSession = useConvexMutation(
+    api.workouts.finalizeWorkoutSession,
+  )
+  const discardWorkoutSession = useConvexMutation(
+    api.workouts.discardWorkoutSession,
+  )
+  const generateWorkoutFitDownload = useAction(
+    api.workoutExports.generateWorkoutFitDownload,
+  )
+  const [isSavingUserData, setIsSavingUserData] = useState(false)
+  const [pendingWorkoutStart, setPendingWorkoutStart] =
+    useState<WorkoutDefinition | null>(null)
+  const [activeSessionId, setActiveSessionId] =
+    useState<Id<'workoutSessions'> | null>(null)
+  const [completedSessionId, setCompletedSessionId] =
+    useState<Id<'workoutSessions'> | null>(null)
   const [isFinalizingWorkout, setIsFinalizingWorkout] = useState(false)
   const [isPreparingFitDownload, setIsPreparingFitDownload] = useState(false)
   const [isDiscardingWorkout, setIsDiscardingWorkout] = useState(false)
-  const [isWorkoutLifecycleActive, setIsWorkoutLifecycleActive] = useState(false)
-  const [fitDownloadErrorMessage, setFitDownloadErrorMessage] = useState<string | null>(null)
-  const [recordingErrorMessage, setRecordingErrorMessage] = useState<string | null>(null)
+  const [isWorkoutLifecycleActive, setIsWorkoutLifecycleActive] =
+    useState(false)
+  const [fitDownloadErrorMessage, setFitDownloadErrorMessage] = useState<
+    string | null
+  >(null)
+  const [recordingErrorMessage, setRecordingErrorMessage] = useState<
+    string | null
+  >(null)
+  const [workoutIntensityPercent, setWorkoutIntensityPercent] = useState(
+    DEFAULT_WORKOUT_INTENSITY_PERCENT,
+  )
   const { data: currentUser } = useSuspenseQuery(currentUserQuery) as {
     data: CurrentUserResult
   }
@@ -153,7 +180,7 @@ function Home() {
         })
       }
     },
-    [appendWorkoutSampleChunk]
+    [appendWorkoutSampleChunk],
   )
 
   const queueChunkFlush = useCallback(
@@ -163,11 +190,13 @@ function Home() {
         .catch(() => {})
         .then(() => flushBufferedSamples(forceFlush))
         .catch((error) => {
-          setRecordingErrorMessage(`Failed to save workout data: ${getErrorMessage(error)}`)
+          setRecordingErrorMessage(
+            `Failed to save workout data: ${getErrorMessage(error)}`,
+          )
         })
       return recorder.flushChain
     },
-    [flushBufferedSamples]
+    [flushBufferedSamples],
   )
 
   const workoutExecution = useWorkoutExecution({
@@ -175,6 +204,7 @@ function Home() {
     livePowerWatts,
     cadenceRpm,
     heartRateBpm,
+    workoutIntensityPercent,
     setErgTargetValue,
     onSample: useCallback(
       (sample: WorkoutExecutionSample) => {
@@ -184,7 +214,6 @@ function Home() {
           elapsedSeconds: sample.elapsedSeconds,
           segmentId: sample.segmentId,
           segmentIndex: sample.segmentIndex,
-          targetWatts: sample.targetWatts,
           powerWatts: sample.livePowerWatts,
           cadenceRpm: sample.cadenceRpm,
           heartRateBpm: sample.heartRateBpm,
@@ -193,7 +222,7 @@ function Home() {
           void queueChunkFlush(false)
         }
       },
-      [queueChunkFlush]
+      [queueChunkFlush],
     ),
   })
   const {
@@ -204,9 +233,9 @@ function Home() {
     activeSegment,
     activeSegmentIndex,
     nextSegment,
-    currentTargetWatts,
     isPaused,
     isCompleted: workoutCompleted,
+    recordedSamples,
     pause,
     resume,
     end: endWorkout,
@@ -217,6 +246,55 @@ function Home() {
   const waitingForFirstPower =
     pendingWorkoutStart !== null && !activeWorkout && !isUsingFakeTelemetry
   const displayedWorkout = activeWorkout ?? pendingWorkoutStart
+  const { avgPowerWatts, avgCadenceRpm, avgHeartRateBpm } = useMemo(() => {
+    let totalPowerWatts = 0
+    let powerSampleCount = 0
+    let totalCadenceRpm = 0
+    let cadenceSampleCount = 0
+    let totalHeartRateBpm = 0
+    let heartRateSampleCount = 0
+
+    for (const sample of recordedSamples) {
+      if (
+        typeof sample.livePowerWatts === 'number' &&
+        Number.isFinite(sample.livePowerWatts)
+      ) {
+        totalPowerWatts += sample.livePowerWatts
+        powerSampleCount += 1
+      }
+
+      if (
+        typeof sample.cadenceRpm === 'number' &&
+        Number.isFinite(sample.cadenceRpm)
+      ) {
+        totalCadenceRpm += sample.cadenceRpm
+        cadenceSampleCount += 1
+      }
+
+      if (
+        typeof sample.heartRateBpm === 'number' &&
+        Number.isFinite(sample.heartRateBpm)
+      ) {
+        totalHeartRateBpm += sample.heartRateBpm
+        heartRateSampleCount += 1
+      }
+    }
+
+    return {
+      avgPowerWatts:
+        powerSampleCount > 0
+          ? Math.round(totalPowerWatts / powerSampleCount)
+          : null,
+      avgCadenceRpm:
+        cadenceSampleCount > 0
+          ? Math.round(totalCadenceRpm / cadenceSampleCount)
+          : null,
+      avgHeartRateBpm:
+        heartRateSampleCount > 0
+          ? Math.round(totalHeartRateBpm / heartRateSampleCount)
+          : null,
+    }
+  }, [recordedSamples])
 
   const finalizeCurrentWorkoutSession = useCallback(
     async (status: 'completed' | 'ended') => {
@@ -241,17 +319,23 @@ function Home() {
         })
         setCompletedSessionId(sessionId)
       } catch (error) {
-        setRecordingErrorMessage(`Failed to finalize workout recording: ${getErrorMessage(error)}`)
+        setRecordingErrorMessage(
+          `Failed to finalize workout recording: ${getErrorMessage(error)}`,
+        )
       } finally {
         setIsFinalizingWorkout(false)
         isFinalizingWorkoutRef.current = false
       }
     },
-    [finalizeWorkoutSession, queueChunkFlush]
+    [finalizeWorkoutSession, queueChunkFlush],
   )
 
   useEffect(() => {
-    if (!workoutCompleted || !activeWorkout || hasFinalizedCurrentWorkoutRef.current) {
+    if (
+      !workoutCompleted ||
+      !activeWorkout ||
+      hasFinalizedCurrentWorkoutRef.current
+    ) {
       return
     }
     hasFinalizedCurrentWorkoutRef.current = true
@@ -267,7 +351,10 @@ function Home() {
     if (activeWorkout) {
       return
     }
-    if (!isUsingFakeTelemetry && (typeof livePowerWatts !== 'number' || livePowerWatts <= 0)) {
+    if (
+      !isUsingFakeTelemetry &&
+      (typeof livePowerWatts !== 'number' || livePowerWatts <= 0)
+    ) {
       return
     }
 
@@ -310,7 +397,7 @@ function Home() {
         }
       } catch (error) {
         setRecordingErrorMessage(
-          `Workout started, but recording could not be initialized: ${getErrorMessage(error)}`
+          `Workout started, but recording could not be initialized: ${getErrorMessage(error)}`,
         )
       }
     })()
@@ -325,16 +412,19 @@ function Home() {
     startWorkoutSession,
   ])
 
-  const handleSaveFtp = async (ftp: number) => {
-    setIsSavingFtp(true)
+  const handleSaveUserData = async (userData: {
+    ftp: number
+    weightKg: number
+  }) => {
+    setIsSavingUserData(true)
     try {
-      await setCurrentUserFtp({ ftp })
-      setErgTargetWatts(ftp)
+      await setCurrentUserFtp(userData)
+      setErgTargetWatts(userData.ftp)
       await queryClient.invalidateQueries({
         queryKey: userDataQuery.queryKey,
       })
     } finally {
-      setIsSavingFtp(false)
+      setIsSavingUserData(false)
     }
   }
 
@@ -342,6 +432,7 @@ function Home() {
     if (!ergControlAvailable && !canUseFakeTelemetry) {
       return
     }
+    setWorkoutIntensityPercent(DEFAULT_WORKOUT_INTENSITY_PERCENT)
     setIsWorkoutLifecycleActive(true)
     setPendingWorkoutStart(workout)
   }
@@ -361,6 +452,7 @@ function Home() {
 
   const handleDoneWorkout = () => {
     stopWorkout()
+    setWorkoutIntensityPercent(DEFAULT_WORKOUT_INTENSITY_PERCENT)
     setIsWorkoutLifecycleActive(false)
     setPendingWorkoutStart(null)
     setActiveSessionId(null)
@@ -378,12 +470,33 @@ function Home() {
     }
   }
 
+  const handleDecreaseIntensity = useCallback(() => {
+    setWorkoutIntensityPercent((current) =>
+      clamp(
+        current - 1,
+        MIN_WORKOUT_INTENSITY_PERCENT,
+        MAX_WORKOUT_INTENSITY_PERCENT,
+      ),
+    )
+  }, [])
+
+  const handleIncreaseIntensity = useCallback(() => {
+    setWorkoutIntensityPercent((current) =>
+      clamp(
+        current + 1,
+        MIN_WORKOUT_INTENSITY_PERCENT,
+        MAX_WORKOUT_INTENSITY_PERCENT,
+      ),
+    )
+  }, [])
+
   const handleDiscardWorkout = async () => {
     if (isDiscardingWorkout) {
       return
     }
 
-    const sessionId = completedSessionId ?? activeSessionId ?? recorderRef.current.sessionId
+    const sessionId =
+      completedSessionId ?? activeSessionId ?? recorderRef.current.sessionId
     if (!sessionId) {
       handleDoneWorkout()
       return
@@ -396,14 +509,17 @@ function Home() {
       await discardWorkoutSession({ sessionId })
       handleDoneWorkout()
     } catch (error) {
-      setFitDownloadErrorMessage(`Unable to discard workout: ${getErrorMessage(error)}`)
+      setFitDownloadErrorMessage(
+        `Unable to discard workout: ${getErrorMessage(error)}`,
+      )
     } finally {
       setIsDiscardingWorkout(false)
     }
   }
 
   const handleDownloadFit = async () => {
-    const sessionId = completedSessionId ?? activeSessionId ?? recorderRef.current.sessionId
+    const sessionId =
+      completedSessionId ?? activeSessionId ?? recorderRef.current.sessionId
     if (!sessionId) {
       setFitDownloadErrorMessage('No recorded session is available to export.')
       return
@@ -424,7 +540,9 @@ function Home() {
       anchor.remove()
       window.URL.revokeObjectURL(downloadUrl)
     } catch (error) {
-      setFitDownloadErrorMessage(`Unable to generate FIT download: ${getErrorMessage(error)}`)
+      setFitDownloadErrorMessage(
+        `Unable to generate FIT download: ${getErrorMessage(error)}`,
+      )
     } finally {
       setIsPreparingFitDownload(false)
     }
@@ -435,9 +553,10 @@ function Home() {
       <div className="cp-shell">
         <Header
           ftp={userData.ftp}
+          weightKg={userData.weightKg}
           userEmail={currentUser?.email ?? null}
-          onSaveFtp={handleSaveFtp}
-          isSavingFtp={isSavingFtp}
+          onSaveUserData={handleSaveUserData}
+          isSavingUserData={isSavingUserData}
           webBluetoothSupported={webBluetoothSupported}
           statusMessage={statusMessage}
           connectionState={connectionState}
@@ -448,39 +567,71 @@ function Home() {
           disconnectHeartRateMonitor={disconnectHeartRateMonitor}
         />
 
-        <MetricCards
-          livePowerWatts={livePowerWatts}
-          cadenceRpm={cadenceRpm}
-          heartRateBpm={heartRateBpm}
-        />
-
         {displayedWorkout ? (
-          <WorkoutProgress
-            ftp={userData.ftp}
-            workout={displayedWorkout}
-            elapsedSeconds={elapsedSeconds}
-            remainingSeconds={remainingSeconds}
-            progressRatio={progressRatio}
-            activeSegment={activeSegment}
-            activeSegmentIndex={activeSegmentIndex}
-            nextSegment={nextSegment}
-            currentTargetWatts={currentTargetWatts}
-            isWaitingForStart={waitingForFirstPower}
-            isPaused={isPaused}
-            isCompleted={workoutCompleted}
-            onPause={pause}
-            onResume={resume}
-            onSkipSegment={skipSegment}
-            onEndWorkout={handleEndWorkout}
-            onDiscardWorkout={handleDiscardWorkout}
-            onDownloadFit={handleDownloadFit}
-            onDone={handleDoneWorkout}
-            canDownloadFit={Boolean(completedSessionId ?? activeSessionId)}
-            isPreparingFitDownload={isPreparingFitDownload}
-            isFinalizingWorkout={isFinalizingWorkout}
-            isDiscardingWorkout={isDiscardingWorkout}
-            fitDownloadErrorMessage={fitDownloadErrorMessage ?? recordingErrorMessage}
-          />
+          <div className="cp-workout-active-view">
+            <header className="cp-workout-progress-header">
+              <h2>{displayedWorkout.title}</h2>
+            </header>
+            <div className="cp-workout-active-layout">
+              <WorkoutBlockSidebar
+                workout={displayedWorkout}
+                ftp={userData.ftp}
+                workoutIntensityPercent={workoutIntensityPercent}
+                activeSegmentIndex={activeSegmentIndex}
+                isWaitingForStart={waitingForFirstPower}
+                isCompleted={workoutCompleted}
+                onDecreaseIntensity={handleDecreaseIntensity}
+                onIncreaseIntensity={handleIncreaseIntensity}
+              />
+              <div className="cp-workout-active-main">
+                <WorkoutLiveStrip
+                  workout={displayedWorkout}
+                  ftp={userData.ftp}
+                  riderWeightKg={userData.weightKg}
+                  activeSegment={activeSegment}
+                  elapsedSeconds={elapsedSeconds}
+                  isWaitingForStart={waitingForFirstPower}
+                  isCompleted={workoutCompleted}
+                  livePowerWatts={livePowerWatts}
+                  cadenceRpm={cadenceRpm}
+                  heartRateBpm={heartRateBpm}
+                  avgPowerWatts={avgPowerWatts}
+                  avgCadenceRpm={avgCadenceRpm}
+                  avgHeartRateBpm={avgHeartRateBpm}
+                  workoutIntensityPercent={workoutIntensityPercent}
+                />
+                <WorkoutTelemetryChart
+                  samples={recordedSamples}
+                  isWaitingForStart={waitingForFirstPower}
+                />
+                <WorkoutProgress
+                  elapsedSeconds={elapsedSeconds}
+                  remainingSeconds={remainingSeconds}
+                  progressRatio={progressRatio}
+                  nextSegment={nextSegment}
+                  isWaitingForStart={waitingForFirstPower}
+                  isPaused={isPaused}
+                  isCompleted={workoutCompleted}
+                  onPause={pause}
+                  onResume={resume}
+                  onSkipSegment={skipSegment}
+                  onEndWorkout={handleEndWorkout}
+                  onDiscardWorkout={handleDiscardWorkout}
+                  onDownloadFit={handleDownloadFit}
+                  onDone={handleDoneWorkout}
+                  canDownloadFit={Boolean(
+                    completedSessionId ?? activeSessionId,
+                  )}
+                  isPreparingFitDownload={isPreparingFitDownload}
+                  isFinalizingWorkout={isFinalizingWorkout}
+                  isDiscardingWorkout={isDiscardingWorkout}
+                  fitDownloadErrorMessage={
+                    fitDownloadErrorMessage ?? recordingErrorMessage
+                  }
+                />
+              </div>
+            </div>
+          </div>
         ) : (
           <WorkoutSelector
             ftp={userData.ftp}
@@ -508,4 +659,8 @@ function getErrorMessage(error: unknown): string {
     return error.message
   }
   return 'Unknown error'
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value))
 }

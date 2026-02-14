@@ -53,7 +53,7 @@
 }
 
 .cp-erg-number {
-  font-family: v.$cp-font-mono;
+  font-family: v.$cp-font-display;
   font-size: 1rem;
   font-weight: 400;
   background: rgba(v.$cp-bg-base, 0.9);
@@ -73,7 +73,7 @@
   position: relative;
   letter-spacing: 0.1em;
   background: v.$cp-surface-action-active;
-  color: v.$cp-text-bright;
+  color: v.$cp-text-heading;
   border: v.$cp-border-thick solid rgba(v.$cp-white, 0.62);
   padding: v.$cp-space-2 v.$cp-space-3;
   transition: v.$cp-transition-panel;

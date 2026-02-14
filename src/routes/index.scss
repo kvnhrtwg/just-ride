@@ -1,0 +1,37 @@
+@use '../variables' as v;
+
+.cp-workout-active-view {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: v.$cp-space-6;
+  flex: 1;
+}
+
+.cp-workout-progress-header {
+  h2 {
+    margin: 0;
+    color: v.$cp-text-heading;
+    font-size: 1.5rem;
+    letter-spacing: 0.03em;
+  }
+}
+
+.cp-workout-active-layout {
+  display: grid;
+  grid-template-columns: minmax(14rem, 18rem) minmax(0, 1fr);
+  gap: v.$cp-space-8;
+  align-items: start;
+}
+
+.cp-workout-active-main {
+  display: flex;
+  flex-direction: column;
+  gap: v.$cp-space-6;
+  height: 100%;
+}
+
+@media (max-width: v.$cp-breakpoint-md) {
+  .cp-workout-active-layout {
+    grid-template-columns: 1fr;
+  }
+}

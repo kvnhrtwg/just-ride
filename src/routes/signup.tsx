@@ -87,7 +87,7 @@ function SignupPage() {
             {error ? <p className="cp-auth-error">{error}</p> : null}
 
             <button
-              className="cp-auth-submit"
+              className="cp-btn cp-auth-submit"
               type="submit"
               disabled={isSubmitting}
             >

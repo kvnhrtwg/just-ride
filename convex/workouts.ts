@@ -7,6 +7,8 @@ import {
 } from './_generated/server'
 
 const chunkSizeLimit = 120
+const maxExpectedSampleStepSeconds = 2
+const nominalSampleStepSeconds = 1
 
 const workoutIntensityValidator = v.union(
   v.literal('lit'),
@@ -21,7 +23,6 @@ const workoutSampleValidator = v.object({
   elapsedSeconds: v.number(),
   segmentId: v.union(v.string(), v.null()),
   segmentIndex: v.number(),
-  targetWatts: v.union(v.number(), v.null()),
   powerWatts: v.union(v.number(), v.null()),
   cadenceRpm: v.union(v.number(), v.null()),
   heartRateBpm: v.union(v.number(), v.null()),
@@ -32,7 +33,6 @@ type WorkoutSample = {
   elapsedSeconds: number
   segmentId: string | null
   segmentIndex: number
-  targetWatts: number | null
   powerWatts: number | null
   cadenceRpm: number | null
   heartRateBpm: number | null
@@ -69,10 +69,6 @@ function normalizeSample(sample: WorkoutSample): WorkoutSample {
     elapsedSeconds: normalizedElapsed,
     segmentId: sample.segmentId,
     segmentIndex: Math.max(0, Math.round(sample.segmentIndex)),
-    targetWatts:
-      typeof sample.targetWatts === 'number' && Number.isFinite(sample.targetWatts)
-        ? Math.max(0, Math.round(sample.targetWatts))
-        : null,
     powerWatts:
       typeof sample.powerWatts === 'number' && Number.isFinite(sample.powerWatts)
         ? Math.max(0, Math.round(sample.powerWatts))
@@ -207,9 +203,13 @@ export const finalizeWorkoutSession = mutation({
       .query('workoutSampleChunks')
       .withIndex('by_session_chunk', (q) => q.eq('sessionId', session._id))
       .collect()
+    const sortedChunks = chunks
+      .slice()
+      .sort((left, right) => left.chunkIndex - right.chunkIndex)
 
     let sampleCount = 0
     let maxElapsedSeconds = 0
+    let compressedElapsedSeconds = 0
     let powerSum = 0
     let powerCount = 0
     let maxPowerWatts: number | null = null
@@ -219,13 +219,26 @@ export const finalizeWorkoutSession = mutation({
     let cadenceSum = 0
     let cadenceCount = 0
     let maxCadenceRpm: number | null = null
+    let previousElapsedSeconds: number | null = null
 
-    for (const chunk of chunks) {
+    for (const chunk of sortedChunks) {
       for (const sample of chunk.samples) {
         sampleCount += 1
         if (sample.elapsedSeconds > maxElapsedSeconds) {
           maxElapsedSeconds = sample.elapsedSeconds
         }
+        if (typeof previousElapsedSeconds === 'number') {
+          const elapsedDelta = sample.elapsedSeconds - previousElapsedSeconds
+          if (elapsedDelta > 0) {
+            compressedElapsedSeconds +=
+              elapsedDelta > maxExpectedSampleStepSeconds
+                ? nominalSampleStepSeconds
+                : elapsedDelta
+          }
+        } else {
+          compressedElapsedSeconds = Math.max(0, sample.elapsedSeconds)
+        }
+        previousElapsedSeconds = sample.elapsedSeconds
         if (typeof sample.powerWatts === 'number') {
           powerSum += sample.powerWatts
           powerCount += 1
@@ -255,7 +268,7 @@ export const finalizeWorkoutSession = mutation({
       status: args.status,
       endedAt,
       sampleCount,
-      elapsedSeconds: maxElapsedSeconds,
+      elapsedSeconds: compressedElapsedSeconds,
       averagePowerWatts: powerCount > 0 ? Math.round(powerSum / powerCount) : undefined,
       maxPowerWatts: maxPowerWatts ?? undefined,
       averageHeartRateBpm:

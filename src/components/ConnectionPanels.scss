@@ -14,7 +14,6 @@
 
 .cp-panel-label {
   display: block;
-  margin-bottom: v.$cp-space-3;
   color: var(--cp-text-secondary);
   letter-spacing: 0.16em;
 }
@@ -38,7 +37,7 @@
 .cp-switch--on,
 .cp-switch--off {
   background: v.$cp-surface-action;
-  color: v.$cp-text-bright;
+  color: v.$cp-text-heading;
   border-color: rgba(v.$cp-white, 0.52);
 
   &:hover:not(:disabled) {

@@ -1,0 +1,131 @@
+@use '../variables' as v;
+
+.cp-workout-block-sidebar {
+  --cp-workout-block-row-gap: #{v.$cp-space-2};
+  --cp-workout-block-indicator-size: 1.25rem;
+
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: v.$cp-space-2;
+}
+
+.cp-workout-block-sidebar-list {
+  display: grid;
+  gap: v.$cp-space-2;
+  overflow-y: auto;
+}
+
+.cp-workout-block-row {
+  display: flex;
+  align-items: center;
+  gap: var(--cp-workout-block-row-gap);
+}
+
+.cp-workout-block {
+  --cp-workout-block-color-muted-alpha: 60%;
+  --cp-workout-block-color-muted: color-mix(
+    in srgb,
+    var(--cp-workout-block-color-solid, rgba(v.$cp-white, 0.9))
+      var(--cp-workout-block-color-muted-alpha),
+    transparent
+  );
+
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: v.$cp-space-2;
+  height: 2.5rem;
+  flex: 1;
+  background: var(--cp-workout-block-color-muted);
+  color: rgba(v.$cp-black, 0.9);
+  padding: 0 v.$cp-space-3;
+  font-weight: 700;
+}
+
+.cp-workout-block-power,
+.cp-workout-block-duration {
+  font-family: v.$cp-font-mono;
+  font-weight:600;
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(v.$cp-black, 0.92);
+  white-space: nowrap;
+}
+
+.cp-workout-block-power {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cp-workout-block-duration {
+  text-align: right;
+}
+
+.cp-workout-block--active {
+  background: var(--cp-workout-block-color-solid, rgba(v.$cp-white, 0.9));
+  box-shadow:
+    0 0 0.75rem rgba(0, 240, 255, 0.45),
+    0 0 1.5rem rgba(255, 45, 149, 0.2);
+}
+
+.cp-workout-block-active-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--cp-workout-block-indicator-size);
+  height: var(--cp-workout-block-indicator-size);
+  flex: 0 0 var(--cp-workout-block-indicator-size);
+  color: transparent;
+
+  svg {
+    transform: scaleX(-1);
+    transform-origin: center;
+    flex-shrink: 0;
+  }
+}
+
+.cp-workout-block-active-indicator--active {
+  color: var(--cp-workout-block-color-solid);
+}
+
+.cp-workout-block-intensity {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: v.$cp-space-2;
+  width: calc(
+    100% - var(--cp-workout-block-indicator-size) - var(--cp-workout-block-row-gap)
+  );
+}
+
+.cp-workout-block-intensity-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: v.$cp-font-display;
+  padding: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  cursor: pointer;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+.cp-workout-block-intensity-value {
+  margin: 0;
+  justify-content: center;
+  font-size: 1rem;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  color: var(--cp-text-primary);
+  font-weight: 600;
+}

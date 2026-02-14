@@ -1,0 +1,50 @@
+@use '../variables' as v;
+
+.cp-popover {
+  position: fixed;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  border: v.$cp-border-thin solid v.$cp-white;
+  background: v.$cp-panel-bg-strong;
+  color: var(--cp-text-primary);
+  width: min(21.25rem, calc(100vw - 2rem));
+  padding: 1rem;
+  box-shadow:
+    0 0 0.875rem rgba(v.$cp-white, 0.42),
+    0 0 1.75rem rgba(v.$cp-white, 0.24);
+
+  &:popover-open {
+    display: grid;
+    gap: 0.75rem;
+  }
+}
+
+.cp-popover--wide {
+  width: min(24rem, calc(100vw - 2rem));
+}
+
+.cp-popover-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.cp-popover-title {
+  margin: 0;
+  font-family: v.$cp-font-display;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cp-accent-cyan);
+}
+
+.cp-popover-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: v.$cp-size-close;
+  height: v.$cp-size-close;
+  cursor: pointer;
+}

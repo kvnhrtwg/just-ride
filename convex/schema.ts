@@ -18,7 +18,6 @@ const workoutSampleValidator = v.object({
   elapsedSeconds: v.number(),
   segmentId: v.union(v.string(), v.null()),
   segmentIndex: v.number(),
-  targetWatts: v.union(v.number(), v.null()),
   powerWatts: v.union(v.number(), v.null()),
   cadenceRpm: v.union(v.number(), v.null()),
   heartRateBpm: v.union(v.number(), v.null()),
@@ -28,6 +27,7 @@ export default defineSchema({
   userData: defineTable({
     userSubject: v.string(),
     ftp: v.number(),
+    weightKg: v.optional(v.number()),
     createdAt: v.number(),
     updatedAt: v.number(),
   }).index('by_user_subject', ['userSubject']),

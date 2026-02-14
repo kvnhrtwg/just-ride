@@ -1,5 +1,5 @@
 $cp-font-display: 'Audiowide', cursive;
-$cp-font-mono: 'Share Tech Mono', monospace;
+$cp-font-mono: 'Noto Sans Mono', monospace;
 
 $cp-white: #fff;
 $cp-black: #000;
@@ -11,7 +11,6 @@ $cp-bg-glow: rgba(0, 240, 255, 0.22);
 $cp-text-primary: #e0d4f5;
 $cp-text-secondary: #aa98cf;
 $cp-text-muted: #7a6a9a;
-$cp-text-bright: #f3f2ff;
 $cp-text-bright-soft: #f2e9ff;
 $cp-text-heading: #f4eaff;
 $cp-text-cyan-bright: #8ff9ff;
@@ -19,15 +18,18 @@ $cp-text-cyan-hover: #76f6ff;
 $cp-text-pink-alert: #ff6bb4;
 $cp-text-pink-button: #ff82c1;
 $cp-text-pink-button-hover: #ff9bcd;
+$cp-text-red-button: #ff9b9b;
+$cp-text-red-button-hover: #ffc4c4;
 
 $cp-accent-cyan: #00f0ff;
 $cp-accent-pink: #ff2d95;
 $cp-accent-purple: #b000ff;
 $cp-accent-yellow: #ffe600;
+$cp-accent-red: #ff4d4d;
 
 $cp-panel-bg: rgba(10, 0, 21, 0.82);
 $cp-panel-bg-strong: rgba(10, 0, 21, 0.98);
-$cp-panel-border: rgba(176, 0, 255, 0.35);
+$cp-panel-border: rgba(255, 255, 255, 0.34);
 
 $cp-surface-input: rgba(15, 3, 26, 0.9);
 $cp-surface-input-strong: rgba(15, 3, 26, 0.95);
@@ -41,6 +43,8 @@ $cp-space-3: 0.75rem;
 $cp-space-4: 1rem;
 $cp-space-5: 1.25rem;
 $cp-space-6: 1.5rem;
+$cp-space-7: 1.75rem;
+$cp-space-8: 2rem;
 
 $cp-border-thin: 1px;
 $cp-border-thick: 2px;
@@ -58,5 +62,7 @@ $cp-breakpoint-md: 48.75rem;
 @mixin cp-focus-ring($color) {
   outline: none;
   border-color: rgba($color, 0.7);
-  box-shadow: 0 0 0 2px rgba($color, 0.14), 0 0 1.25rem rgba($color, 0.2);
+  box-shadow:
+    0 0 0 2px rgba($color, 0.14),
+    0 0 1.25rem rgba($color, 0.2);
 }

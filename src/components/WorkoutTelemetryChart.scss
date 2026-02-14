@@ -1,0 +1,25 @@
+@use '../variables' as v;
+
+.cp-workout-telemetry {
+  display: grid;
+  gap: v.$cp-space-3;
+  padding: v.$cp-space-3;
+  flex: 1;
+}
+
+
+.cp-workout-telemetry-canvas {
+  position: relative;
+}
+
+.cp-workout-telemetry-empty {
+  min-height: 12rem;
+  margin: 0;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  color: v.$cp-text-secondary;
+  border: v.$cp-border-thin dashed rgba(v.$cp-white, 0.28);
+  background: rgba(v.$cp-white, 0.03);
+  padding: v.$cp-space-3;
+}

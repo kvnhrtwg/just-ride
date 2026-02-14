@@ -41,7 +41,7 @@ export function WorkoutSelector({
     <section className="cp-workout-selector">
       <button
         type="button"
-        className="cp-workout-toggle"
+        className="cp-btn cp-workout-toggle"
         onClick={handleToggleSelector}
         aria-expanded={isOpen}
         aria-controls="cp-workout-chooser"
@@ -65,7 +65,7 @@ export function WorkoutSelector({
                 type="button"
                 role="tab"
                 aria-selected={selectedIntensity === intensity}
-                className={`cp-workout-level ${
+                className={`cp-btn cp-workout-level ${
                   selectedIntensity === intensity ? 'cp-workout-level--active' : ''
                 }`}
                 onClick={() => handleSelectIntensity(intensity)}
@@ -92,7 +92,7 @@ export function WorkoutSelector({
                   <div className="cp-workout-actions">
                     <button
                       type="button"
-                      className="cp-workout-action cp-workout-action--start"
+                      className="cp-btn cp-workout-action cp-workout-action--start"
                       disabled={
                         workout.segments.length === 0 ||
                         (!ergControlAvailable && !canStartWithoutTrainer)

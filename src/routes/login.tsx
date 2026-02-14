@@ -72,7 +72,11 @@ function LoginPage() {
 
             {error ? <p className="cp-auth-error">{error}</p> : null}
 
-            <button className="cp-auth-submit" type="submit" disabled={isSubmitting}>
+            <button
+              className="cp-btn cp-auth-submit"
+              type="submit"
+              disabled={isSubmitting}
+            >
               {isSubmitting ? 'Signing in...' : 'Sign in'}
             </button>
           </form>

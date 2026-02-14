@@ -40,7 +40,7 @@ export function ErgControlStrip({
           onChange={(e) => setErgTargetWatts(Number(e.target.value))}
         />
         <button
-          className="cp-erg-set"
+          className="cp-btn cp-erg-set"
           onClick={setErgTarget}
           disabled={connectionState !== "connected"}
         >

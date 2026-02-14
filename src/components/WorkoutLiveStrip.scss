@@ -1,0 +1,152 @@
+@use '../variables' as v;
+
+.cp-workout-live-strip {
+  display: grid;
+  gap: v.$cp-space-4;
+}
+
+.cp-workout-live-block {
+  --cp-workout-live-zone-color: v.$cp-white, 0.72;
+  --cp-workout-live-zone-muted-alpha: 75%;
+  --cp-workout-live-zone-progress: 0%;
+  --cp-workout-live-zone-transition: 1000ms;
+
+  position: relative;
+  height: 3rem;
+  background: color-mix(
+    in srgb,
+    var(--cp-workout-live-zone-color) var(--cp-workout-live-zone-muted-alpha),
+    transparent
+  );
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: v.$cp-space-2;
+  padding: 0 v.$cp-space-3;
+  box-shadow:
+    0 0 0.75rem rgba(0, 240, 255, 0.45),
+    0 0 1.5rem rgba(255, 45, 149, 0.2);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: var(--cp-workout-live-zone-progress);
+    background: var(--cp-workout-live-zone-color);
+    transition: width var(--cp-workout-live-zone-transition) linear;
+  }
+
+}
+
+.cp-workout-live-block-power,
+.cp-workout-live-block-remaining {
+  position: relative;
+  z-index: 1;
+  font-family: v.$cp-font-mono;
+  text-transform: uppercase;
+  color: rgba(v.$cp-black, 0.9);
+  white-space: nowrap;
+}
+
+.cp-workout-live-block-power, .cp-workout-live-block-remaining  {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.cp-workout-live-metrics {
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: v.$cp-space-5;
+}
+
+.cp-workout-live-metric {
+  display: inline-grid;
+  align-items: center;
+  column-gap: v.$cp-space-2;
+  row-gap: v.$cp-space-2;
+  min-width: 4.75rem;
+}
+
+.cp-workout-live-metric-icon {
+  color: var(--cp-text-muted);
+  margin-right: v.$cp-space-1;
+}
+
+.cp-workout-live-metric-value {
+  margin: 0;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.25rem;
+  font-family: v.$cp-font-mono;
+  font-size: 2rem;
+  line-height: 0.8;
+  justify-content: end;
+}
+
+.cp-workout-live-metric-average {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: v.$cp-space-1;
+  font-size: 0.75rem;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: v.$cp-text-heading;
+  justify-self: end;
+}
+
+
+.cp-workout-live-metric-average-icon,
+.cp-workout-live-metric-average-unit {
+  color: v.$cp-text-heading;
+}
+
+.cp-workout-live-metric-average-unit {
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+}
+
+.cp-workout-live-metric-unit {
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  color: var(--cp-text-muted);
+}
+
+.cp-workout-live-metric--power .cp-workout-live-metric-value {
+  color: var(--cp-accent-cyan);
+}
+
+.cp-workout-live-metric--power .cp-workout-live-metric-icon {
+  color: var(--cp-accent-cyan);
+}
+
+.cp-workout-live-metric--cadence .cp-workout-live-metric-value {
+  color: var(--cp-accent-purple);
+}
+
+.cp-workout-live-metric--cadence .cp-workout-live-metric-icon {
+  color: var(--cp-accent-purple);
+}
+
+.cp-workout-live-metric--bpm .cp-workout-live-metric-value {
+  color: var(--cp-accent-pink);
+}
+
+.cp-workout-live-metric--bpm .cp-workout-live-metric-icon {
+  color: var(--cp-accent-pink);
+}
+
+@media (max-width: v.$cp-breakpoint-md) {
+  .cp-workout-live-metrics {
+    justify-content: space-between;
+  }
+
+  .cp-workout-live-metric {
+    justify-items: start;
+  }
+}

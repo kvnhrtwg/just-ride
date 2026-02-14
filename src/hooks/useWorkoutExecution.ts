@@ -19,6 +19,7 @@ type UseWorkoutExecutionOptions = {
   livePowerWatts: number | null
   cadenceRpm: number | null
   heartRateBpm: number | null
+  workoutIntensityPercent?: number
   setErgTargetValue: (
     value: number,
     options?: { announce?: boolean }
@@ -54,6 +55,7 @@ export function useWorkoutExecution({
   livePowerWatts,
   cadenceRpm,
   heartRateBpm,
+  workoutIntensityPercent = 100,
   setErgTargetValue,
   onSample,
   rampUpdateIntervalSeconds = DEFAULT_RAMP_UPDATE_INTERVAL_SECONDS,
@@ -195,11 +197,14 @@ export function useWorkoutExecution({
       return
     }
 
-    const nextTarget = getSegmentTargetWatts({
-      segment,
-      secondsIntoSegment: dispatchSecond,
-      ftp,
-    })
+    const nextTarget = applyWorkoutIntensity(
+      getSegmentTargetWatts({
+        segment,
+        secondsIntoSegment: dispatchSecond,
+        ftp,
+      }),
+      workoutIntensityPercent,
+    )
     setCurrentTargetWatts(nextTarget)
 
     const isScheduledDispatch = dispatchSecond === secondsIntoSegment
@@ -228,6 +233,7 @@ export function useWorkoutExecution({
     isRunning,
     rampUpdateIntervalSeconds,
     setErgTargetValue,
+    workoutIntensityPercent,
   ])
 
   useEffect(() => {
@@ -363,6 +369,14 @@ function getSegmentTargetWatts({
   const progress = boundedSeconds / denominator
   const ftpRatio = segment.ftpLow + (segment.ftpHigh - segment.ftpLow) * progress
   return Math.round(ftpRatio * safeFtp)
+}
+
+function applyWorkoutIntensity(baseWatts: number, workoutIntensityPercent: number): number {
+  const normalizedPercent = Number.isFinite(workoutIntensityPercent)
+    ? workoutIntensityPercent
+    : 100
+  const scaledWatts = Math.round(baseWatts * (normalizedPercent / 100))
+  return clamp(scaledWatts, 0, 2000)
 }
 
 function clamp(value: number, min: number, max: number): number {
