@@ -1,4 +1,6 @@
 import type { WorkoutDefinition, WorkoutSegment } from '@/workouts/catalog'
+import { X } from 'lucide-react'
+import { useId, useRef } from 'react'
 import { WorkoutTimeline } from '@/components/WorkoutTimeline'
 import './WorkoutProgress.scss'
 
@@ -19,6 +21,14 @@ type WorkoutProgressProps = {
   onResume: () => void
   onSkipSegment: () => void
   onEndWorkout: () => void
+  onDiscardWorkout: () => Promise<void>
+  onDownloadFit: () => void
+  onDone: () => void
+  canDownloadFit: boolean
+  isPreparingFitDownload: boolean
+  isFinalizingWorkout: boolean
+  isDiscardingWorkout: boolean
+  fitDownloadErrorMessage: string | null
 }
 
 export function WorkoutProgress({
@@ -38,8 +48,27 @@ export function WorkoutProgress({
   onResume,
   onSkipSegment,
   onEndWorkout,
+  onDiscardWorkout,
+  onDownloadFit,
+  onDone,
+  canDownloadFit,
+  isPreparingFitDownload,
+  isFinalizingWorkout,
+  isDiscardingWorkout,
+  fitDownloadErrorMessage,
 }: WorkoutProgressProps) {
+  const endWorkoutPopoverId = useId()
+  const discardWorkoutPopoverId = useId()
+  const discardWorkoutPopoverRef = useRef<HTMLDivElement | null>(null)
+  const endWorkoutPopoverRef = useRef<HTMLDivElement | null>(null)
   const progressPercent = Math.round(Math.min(1, Math.max(0, progressRatio)) * 100)
+  const blockRemainingSeconds = getBlockRemainingSeconds({
+    workout,
+    activeSegment,
+    elapsedSeconds,
+    isWaitingForStart,
+    isCompleted,
+  })
 
   return (
     <section className="cp-workout-progress cp-panel" aria-live="polite">
@@ -71,12 +100,15 @@ export function WorkoutProgress({
 
       <div className="cp-workout-progress-metrics">
         <Metric label="Elapsed" value={formatDuration(elapsedSeconds)} />
+        <Metric
+          label="Block Remaining"
+          value={blockRemainingSeconds === null ? '--' : formatDuration(blockRemainingSeconds)}
+        />
         <Metric label="Remaining" value={formatDuration(remainingSeconds)} />
         <Metric
           label="Target"
           value={currentTargetWatts === null ? '--' : `${currentTargetWatts} W`}
         />
-        <Metric label="Progress" value={`${progressPercent}%`} />
       </div>
 
       <div className="cp-workout-progress-bar" role="progressbar" aria-valuenow={progressPercent}>
@@ -122,7 +154,39 @@ export function WorkoutProgress({
       </div>
 
       <div className="cp-workout-progress-actions">
-        {isCompleted || isWaitingForStart ? null : isPaused ? (
+        {isCompleted ? (
+          <>
+            <button
+              type="button"
+              className="cp-workout-progress-action"
+              onClick={onDownloadFit}
+              disabled={!canDownloadFit || isPreparingFitDownload || isFinalizingWorkout}
+            >
+              {isFinalizingWorkout
+                ? 'Finalizing'
+                : isPreparingFitDownload
+                  ? 'Preparing FIT'
+                  : 'Download FIT'}
+            </button>
+            <button
+              type="button"
+              className="cp-workout-progress-action cp-workout-progress-action--secondary"
+              onClick={onDone}
+              disabled={isDiscardingWorkout}
+            >
+              Done
+            </button>
+            <button
+              type="button"
+              className="cp-workout-progress-action cp-workout-progress-action--danger"
+              popoverTarget={discardWorkoutPopoverId}
+              popoverTargetAction="toggle"
+              disabled={isDiscardingWorkout || isPreparingFitDownload || isFinalizingWorkout}
+            >
+              {isDiscardingWorkout ? 'Discarding' : 'Discard Workout'}
+            </button>
+          </>
+        ) : isWaitingForStart ? null : isPaused ? (
           <button type="button" className="cp-workout-progress-action" onClick={onResume}>
             Resume
           </button>
@@ -142,11 +206,103 @@ export function WorkoutProgress({
         <button
           type="button"
           className="cp-workout-progress-action cp-workout-progress-action--danger"
-          onClick={onEndWorkout}
+          onClick={isWaitingForStart ? onEndWorkout : undefined}
+          popoverTarget={isWaitingForStart ? undefined : endWorkoutPopoverId}
+          popoverTargetAction={isWaitingForStart ? undefined : 'toggle'}
+          disabled={isCompleted}
         >
           {isWaitingForStart ? 'Cancel Workout' : 'End Workout'}
         </button>
       </div>
+      <div
+        id={endWorkoutPopoverId}
+        ref={endWorkoutPopoverRef}
+        popover="auto"
+        className="cp-workout-progress-confirm-popover"
+        role="dialog"
+        aria-labelledby={`${endWorkoutPopoverId}-title`}
+      >
+        <div className="cp-workout-progress-confirm-header">
+          <h3 id={`${endWorkoutPopoverId}-title`}>End workout?</h3>
+          <button
+            type="button"
+            className="cp-workout-progress-confirm-close"
+            popoverTarget={endWorkoutPopoverId}
+            popoverTargetAction="hide"
+            aria-label="Close end workout confirmation"
+          >
+            <X size={14} aria-hidden="true" />
+          </button>
+        </div>
+        <p>This will end the workout now. You can still download or discard it afterward.</p>
+        <div className="cp-workout-progress-confirm-actions">
+          <button
+            type="button"
+            className="cp-workout-progress-action cp-workout-progress-action--secondary"
+            popoverTarget={endWorkoutPopoverId}
+            popoverTargetAction="hide"
+          >
+            Keep Riding
+          </button>
+          <button
+            type="button"
+            className="cp-workout-progress-action cp-workout-progress-action--danger"
+            onClick={() => {
+              onEndWorkout()
+              endWorkoutPopoverRef.current?.hidePopover()
+            }}
+          >
+            End Workout
+          </button>
+        </div>
+      </div>
+      <div
+        id={discardWorkoutPopoverId}
+        ref={discardWorkoutPopoverRef}
+        popover="auto"
+        className="cp-workout-progress-confirm-popover"
+        role="dialog"
+        aria-labelledby={`${discardWorkoutPopoverId}-title`}
+      >
+        <div className="cp-workout-progress-confirm-header">
+          <h3 id={`${discardWorkoutPopoverId}-title`}>Discard workout?</h3>
+          <button
+            type="button"
+            className="cp-workout-progress-confirm-close"
+            popoverTarget={discardWorkoutPopoverId}
+            popoverTargetAction="hide"
+            aria-label="Close discard confirmation"
+          >
+            <X size={14} aria-hidden="true" />
+          </button>
+        </div>
+        <p>This permanently removes this workout and its recorded data.</p>
+        <div className="cp-workout-progress-confirm-actions">
+          <button
+            type="button"
+            className="cp-workout-progress-action cp-workout-progress-action--secondary"
+            popoverTarget={discardWorkoutPopoverId}
+            popoverTargetAction="hide"
+            disabled={isDiscardingWorkout}
+          >
+            Keep Workout
+          </button>
+          <button
+            type="button"
+            className="cp-workout-progress-action cp-workout-progress-action--danger"
+            onClick={async () => {
+              await onDiscardWorkout()
+              discardWorkoutPopoverRef.current?.hidePopover()
+            }}
+            disabled={isDiscardingWorkout}
+          >
+            {isDiscardingWorkout ? 'Discarding' : 'Discard'}
+          </button>
+        </div>
+      </div>
+      {fitDownloadErrorMessage ? (
+        <p className="cp-workout-progress-download-error">{fitDownloadErrorMessage}</p>
+      ) : null}
     </section>
   )
 }
@@ -188,4 +344,33 @@ function formatDuration(totalSeconds: number): string {
     2,
     '0'
   )}`
+}
+
+function getBlockRemainingSeconds({
+  workout,
+  activeSegment,
+  elapsedSeconds,
+  isWaitingForStart,
+  isCompleted,
+}: {
+  workout: WorkoutDefinition
+  activeSegment: WorkoutSegment | null
+  elapsedSeconds: number
+  isWaitingForStart: boolean
+  isCompleted: boolean
+}): number | null {
+  if (isCompleted) {
+    return 0
+  }
+
+  if (isWaitingForStart) {
+    return workout.segments[0]?.durationSeconds ?? null
+  }
+
+  if (!activeSegment) {
+    return null
+  }
+
+  const secondsIntoSegment = Math.max(0, elapsedSeconds - activeSegment.startSecond)
+  return Math.max(0, activeSegment.durationSeconds - secondsIntoSegment)
 }

@@ -10,12 +10,14 @@ export type WorkoutExecutionSample = {
   segmentIndex: number
   targetWatts: number | null
   livePowerWatts: number | null
+  cadenceRpm: number | null
   heartRateBpm: number | null
 }
 
 type UseWorkoutExecutionOptions = {
   ftp: number
   livePowerWatts: number | null
+  cadenceRpm: number | null
   heartRateBpm: number | null
   setErgTargetValue: (
     value: number,
@@ -42,6 +44,7 @@ export type WorkoutExecutionModel = {
   start: (workout: WorkoutDefinition) => void
   pause: () => void
   resume: () => void
+  end: () => void
   skipSegment: () => void
   stop: () => void
 }
@@ -49,6 +52,7 @@ export type WorkoutExecutionModel = {
 export function useWorkoutExecution({
   ftp,
   livePowerWatts,
+  cadenceRpm,
   heartRateBpm,
   setErgTargetValue,
   onSample,
@@ -102,6 +106,13 @@ export function useWorkoutExecution({
   const resume = useCallback(() => {
     setIsPaused(false)
     setIsRunning(true)
+  }, [])
+
+  const end = useCallback(() => {
+    setIsRunning(false)
+    setIsPaused(false)
+    setIsCompleted(true)
+    setCurrentTargetWatts(null)
   }, [])
 
   const stop = useCallback(() => {
@@ -238,6 +249,7 @@ export function useWorkoutExecution({
       segmentIndex: activeSegmentIndex,
       targetWatts: currentTargetWatts,
       livePowerWatts,
+      cadenceRpm,
       heartRateBpm,
     }
     setRecordedSamples((current) => [...current, sample])
@@ -252,6 +264,7 @@ export function useWorkoutExecution({
     isCompleted,
     isPaused,
     isRunning,
+    cadenceRpm,
     livePowerWatts,
     onSample,
   ])
@@ -273,6 +286,7 @@ export function useWorkoutExecution({
     start,
     pause,
     resume,
+    end,
     skipSegment,
     stop,
   }

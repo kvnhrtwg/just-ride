@@ -13,14 +13,14 @@
   font-family: v.$cp-font-display;
   font-size: 0.75rem;
   color: var(--cp-accent-cyan);
-  border: v.$cp-border-thin solid rgba(v.$cp-accent-cyan, 0.52);
+  border: v.$cp-border-thin solid rgba(v.$cp-white, 0.52);
   background: v.$cp-surface-input;
   padding: v.$cp-space-2 v.$cp-space-3;
   cursor: pointer;
   transition: border-color v.$cp-transition-fast, box-shadow v.$cp-transition-fast, color v.$cp-transition-fast;
 
   &:hover {
-    border-color: rgba(v.$cp-accent-cyan, 0.82);
+    border-color: rgba(v.$cp-white, 0.8);
     color: v.$cp-text-cyan-bright;
     box-shadow:
       0 0 0.75rem rgba(v.$cp-accent-cyan, 0.26),
@@ -32,7 +32,7 @@
   display: grid;
   gap: v.$cp-space-3;
   background: v.$cp-panel-bg;
-  border: v.$cp-border-thin solid v.$cp-panel-border;
+  border: v.$cp-border-thin solid rgba(v.$cp-white, 0.34);
   padding: v.$cp-space-3;
 }
 
@@ -43,7 +43,7 @@
 }
 
 .cp-workout-level {
-  border: v.$cp-border-thin solid rgba(v.$cp-accent-purple, 0.55);
+  border: v.$cp-border-thin solid rgba(v.$cp-white, 0.34);
   background: rgba(v.$cp-bg-base, 0.9);
   color: var(--cp-text-secondary);
   text-transform: uppercase;
@@ -56,7 +56,7 @@
 }
 
 .cp-workout-level--active {
-  border-color: rgba(v.$cp-accent-yellow, 0.75);
+  border-color: rgba(v.$cp-white, 0.62);
   color: var(--cp-accent-yellow);
   box-shadow: 0 0 0.75rem rgba(v.$cp-accent-yellow, 0.2);
 }
@@ -126,12 +126,12 @@
 }
 
 .cp-workout-action--detail {
-  border-color: rgba(v.$cp-accent-cyan, 0.52);
+  border-color: rgba(v.$cp-white, 0.52);
   color: var(--cp-accent-cyan);
 }
 
 .cp-workout-action--start {
-  border-color: rgba(v.$cp-accent-yellow, 0.55);
+  border-color: rgba(v.$cp-white, 0.52);
   color: var(--cp-accent-yellow);
 }
 

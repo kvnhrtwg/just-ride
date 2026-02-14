@@ -11,6 +11,8 @@
 import type * as auth from "../auth.js";
 import type * as http from "../http.js";
 import type * as userData from "../userData.js";
+import type * as workoutExports from "../workoutExports.js";
+import type * as workouts from "../workouts.js";
 
 import type {
   ApiFromModules,
@@ -22,6 +24,8 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   http: typeof http;
   userData: typeof userData;
+  workoutExports: typeof workoutExports;
+  workouts: typeof workouts;
 }>;
 
 /**

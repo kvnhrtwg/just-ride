@@ -4,6 +4,7 @@
   display: grid;
   gap: v.$cp-space-3;
   margin-bottom: v.$cp-space-2;
+  border-color: rgba(v.$cp-white, 0.34);
 }
 
 .cp-workout-progress-header {
@@ -37,22 +38,22 @@
 
 .cp-workout-progress-state--running {
   color: var(--cp-accent-cyan);
-  border-color: rgba(v.$cp-accent-cyan, 0.52);
+  border-color: rgba(v.$cp-white, 0.52);
 }
 
 .cp-workout-progress-state--paused {
   color: var(--cp-accent-yellow);
-  border-color: rgba(v.$cp-accent-yellow, 0.52);
+  border-color: rgba(v.$cp-white, 0.52);
 }
 
 .cp-workout-progress-state--waiting {
   color: var(--cp-accent-yellow);
-  border-color: rgba(v.$cp-accent-yellow, 0.52);
+  border-color: rgba(v.$cp-white, 0.52);
 }
 
 .cp-workout-progress-state--completed {
   color: var(--cp-accent-purple);
-  border-color: rgba(v.$cp-accent-purple, 0.52);
+  border-color: rgba(v.$cp-white, 0.52);
 }
 
 .cp-workout-progress-waiting {
@@ -88,7 +89,7 @@
 .cp-workout-progress-bar {
   width: 100%;
   height: 0.75rem;
-  border: v.$cp-border-thin solid rgba(v.$cp-accent-cyan, 0.42);
+  border: v.$cp-border-thin solid rgba(v.$cp-white, 0.34);
   background: rgba(v.$cp-bg-base, 0.82);
   overflow: hidden;
 
@@ -148,7 +149,7 @@
 }
 
 .cp-workout-progress-action {
-  border: v.$cp-border-thin solid rgba(v.$cp-accent-cyan, 0.55);
+  border: v.$cp-border-thin solid rgba(v.$cp-white, 0.52);
   background: v.$cp-surface-input;
   color: var(--cp-accent-cyan);
   font-family: v.$cp-font-display;
@@ -165,13 +166,86 @@
 }
 
 .cp-workout-progress-action--secondary {
-  border-color: rgba(v.$cp-accent-yellow, 0.55);
+  border-color: rgba(v.$cp-white, 0.52);
   color: var(--cp-accent-yellow);
 }
 
 .cp-workout-progress-action--danger {
-  border-color: rgba(v.$cp-accent-pink, 0.55);
+  border-color: rgba(v.$cp-white, 0.52);
   color: var(--cp-accent-pink);
+}
+
+.cp-workout-progress-download-error {
+  margin: 0;
+  color: var(--cp-accent-pink);
+  font-size: 0.8125rem;
+}
+
+.cp-workout-progress-confirm-popover {
+  position: fixed;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  border: v.$cp-border-thin solid rgba(v.$cp-accent-purple, 0.5);
+  background: v.$cp-panel-bg-strong;
+  color: var(--cp-text-primary);
+  width: min(21.25rem, calc(100vw - 2rem));
+  padding: 1rem;
+  box-shadow:
+    0 0 0 1px rgba(v.$cp-accent-purple, 0.22) inset,
+    0 0.75rem 2rem rgba(v.$cp-black, 0.5),
+    0 0 1.25rem rgba(v.$cp-accent-cyan, 0.2);
+
+  &:popover-open {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  p {
+    margin: 0;
+    color: var(--cp-text-secondary);
+    font-size: 0.8125rem;
+  }
+}
+
+.cp-workout-progress-confirm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+
+  h3 {
+    margin: 0;
+    font-family: v.$cp-font-display;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--cp-accent-cyan);
+  }
+}
+
+.cp-workout-progress-confirm-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: v.$cp-border-thin solid rgba(v.$cp-accent-purple, 0.45);
+  background: v.$cp-surface-input-strong;
+  color: var(--cp-text-secondary);
+  width: v.$cp-size-close;
+  height: v.$cp-size-close;
+  cursor: pointer;
+
+  &:hover {
+    border-color: rgba(v.$cp-accent-cyan, 0.65);
+    color: var(--cp-accent-cyan);
+  }
+}
+
+.cp-workout-progress-confirm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: v.$cp-space-2;
 }
 
 @media (max-width: v.$cp-breakpoint-md) {

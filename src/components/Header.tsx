@@ -1,5 +1,7 @@
-import { Settings2, X } from 'lucide-react'
+import { Bluetooth, User, X } from 'lucide-react'
 import { type FormEvent, useEffect, useId, useRef, useState } from 'react'
+import { ConnectionPanels } from '@/components/ConnectionPanels'
+import { type ConnectionState } from '@/hooks/useTrainerBluetooth'
 import { authClient } from '@/lib/auth-client'
 import './Header.scss'
 
@@ -8,11 +10,33 @@ type HeaderProps = {
   userEmail: string | null
   isSavingFtp: boolean
   onSaveFtp: (ftp: number) => Promise<void>
+  webBluetoothSupported: boolean
+  statusMessage: string
+  connectionState: ConnectionState
+  heartRateConnectionState: ConnectionState
+  connectTrainer: () => Promise<void>
+  disconnectTrainer: () => void
+  connectHeartRateMonitor: () => Promise<void>
+  disconnectHeartRateMonitor: () => void
 }
 
-export function Header({ ftp, userEmail, isSavingFtp, onSaveFtp }: HeaderProps) {
-  const popoverId = useId()
-  const popoverRef = useRef<HTMLDivElement | null>(null)
+export function Header({
+  ftp,
+  userEmail,
+  isSavingFtp,
+  onSaveFtp,
+  webBluetoothSupported,
+  statusMessage,
+  connectionState,
+  heartRateConnectionState,
+  connectTrainer,
+  disconnectTrainer,
+  connectHeartRateMonitor,
+  disconnectHeartRateMonitor,
+}: HeaderProps) {
+  const userPopoverId = useId()
+  const devicesPopoverId = useId()
+  const userPopoverRef = useRef<HTMLDivElement | null>(null)
   const [ftpInput, setFtpInput] = useState(String(ftp))
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
@@ -41,7 +65,7 @@ export function Header({ ftp, userEmail, isSavingFtp, onSaveFtp }: HeaderProps) 
     try {
       await onSaveFtp(normalizedValue)
       setSuccessMessage('FTP saved.')
-      popoverRef.current?.hidePopover()
+      userPopoverRef.current?.hidePopover()
     } catch (error) {
       const message =
         error instanceof Error && error.message
@@ -64,7 +88,7 @@ export function Header({ ftp, userEmail, isSavingFtp, onSaveFtp }: HeaderProps) 
         return
       }
 
-      popoverRef.current?.hidePopover()
+      userPopoverRef.current?.hidePopover()
       window.location.href = '/login'
     } catch (error) {
       const message =
@@ -80,41 +104,89 @@ export function Header({ ftp, userEmail, isSavingFtp, onSaveFtp }: HeaderProps) 
   return (
     <header className="cp-header">
       <h1>Just Ride</h1>
-      <button
-        type="button"
-        className="cp-settings-trigger"
-        popoverTarget={popoverId}
-        popoverTargetAction="toggle"
-        aria-label="Open settings"
-        aria-haspopup="dialog"
-      >
-        <Settings2 size={16} aria-hidden="true" />
-        <span>Settings</span>
-      </button>
+      <div className="cp-header-actions">
+        <button
+          type="button"
+          className="cp-settings-trigger"
+          popoverTarget={devicesPopoverId}
+          popoverTargetAction="toggle"
+          aria-label="Open devices"
+          aria-haspopup="dialog"
+        >
+          <Bluetooth size={16} aria-hidden="true" />
+          <span>Devices</span>
+        </button>
+        <button
+          type="button"
+          className="cp-settings-trigger"
+          popoverTarget={userPopoverId}
+          popoverTargetAction="toggle"
+          aria-label="Open user settings"
+          aria-haspopup="dialog"
+        >
+          <User size={16} aria-hidden="true" />
+          <span>User</span>
+        </button>
+      </div>
       <div
-        id={popoverId}
-        ref={popoverRef}
+        id={devicesPopoverId}
         popover="auto"
-        className="cp-settings-popover"
+        className="cp-devices-popover"
         role="dialog"
-        aria-labelledby={`${popoverId}-title`}
+        aria-labelledby={`${devicesPopoverId}-title`}
       >
         <div className="cp-settings-popover-header">
-          <h2 id={`${popoverId}-title`}>Settings</h2>
+          <h2 id={`${devicesPopoverId}-title`}>Devices</h2>
           <button
             type="button"
             className="cp-settings-close"
-            popoverTarget={popoverId}
+            popoverTarget={devicesPopoverId}
             popoverTargetAction="hide"
-            aria-label="Close settings"
+            aria-label="Close devices"
+          >
+            <X size={14} aria-hidden="true" />
+          </button>
+        </div>
+        {!webBluetoothSupported ? (
+          <p className="cp-devices-unsupported">
+            Web Bluetooth is not supported in this browser.
+          </p>
+        ) : null}
+        <ConnectionPanels
+          webBluetoothSupported={webBluetoothSupported}
+          connectionState={connectionState}
+          heartRateConnectionState={heartRateConnectionState}
+          connectTrainer={connectTrainer}
+          disconnectTrainer={disconnectTrainer}
+          connectHeartRateMonitor={connectHeartRateMonitor}
+          disconnectHeartRateMonitor={disconnectHeartRateMonitor}
+        />
+        <p className="cp-devices-status">{statusMessage}</p>
+      </div>
+      <div
+        id={userPopoverId}
+        ref={userPopoverRef}
+        popover="auto"
+        className="cp-settings-popover"
+        role="dialog"
+        aria-labelledby={`${userPopoverId}-title`}
+      >
+        <div className="cp-settings-popover-header">
+          <h2 id={`${userPopoverId}-title`}>User</h2>
+          <button
+            type="button"
+            className="cp-settings-close"
+            popoverTarget={userPopoverId}
+            popoverTargetAction="hide"
+            aria-label="Close user settings"
           >
             <X size={14} aria-hidden="true" />
           </button>
         </div>
         <form className="cp-settings-form" onSubmit={handleSubmit}>
-          <label htmlFor={`${popoverId}-ftp`}>FTP</label>
+          <label htmlFor={`${userPopoverId}-ftp`}>FTP</label>
           <input
-            id={`${popoverId}-ftp`}
+            id={`${userPopoverId}-ftp`}
             type="number"
             min={1}
             max={2000}
@@ -131,8 +203,8 @@ export function Header({ ftp, userEmail, isSavingFtp, onSaveFtp }: HeaderProps) 
           </div>
         </form>
         <div className="cp-settings-divider" role="presentation" />
-        <section className="cp-settings-user" aria-labelledby={`${popoverId}-user`}>
-          <h3 id={`${popoverId}-user`}>User</h3>
+        <section className="cp-settings-user" aria-labelledby={`${userPopoverId}-user`}>
+          <h3 id={`${userPopoverId}-user`}>Account</h3>
           <p className="cp-settings-user-email">{userEmail ?? 'Email unavailable'}</p>
           {signOutErrorMessage ? (
             <p className="cp-settings-error">{signOutErrorMessage}</p>

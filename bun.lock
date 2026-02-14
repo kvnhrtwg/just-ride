@@ -7,6 +7,7 @@
       "dependencies": {
         "@convex-dev/better-auth": "^0.10.10",
         "@convex-dev/react-query": "^0.1.0",
+        "@garmin/fitsdk": "^21.194.0",
         "@tanstack/react-devtools": "^0.7.0",
         "@tanstack/react-query": "^5.90.20",
         "@tanstack/react-router": "^1.132.0",
@@ -225,6 +226,8 @@
     "@eslint/plugin-kit": ["@eslint/plugin-kit@0.4.1", "", { "dependencies": { "@eslint/core": "^0.17.0", "levn": "^0.4.1" } }, "sha512-43/qtrDUokr7LJqoF2c3+RInu/t4zfrpYdoSDfYyhg52rwLV6TnOvdG4fXm7IkSB3wErkcmJS9iEhjVtOSEjjA=="],
 
     "@exodus/bytes": ["@exodus/bytes@1.11.0", "", { "peerDependencies": { "@noble/hashes": "^1.8.0 || ^2.0.0" }, "optionalPeers": ["@noble/hashes"] }, "sha512-wO3vd8nsEHdumsXrjGO/v4p6irbg7hy9kvIeR6i2AwylZSk4HJdWgL0FNaVquW1+AweJcdvU1IEpuIWk/WaPnA=="],
+
+    "@garmin/fitsdk": ["@garmin/fitsdk@21.194.0", "", {}, "sha512-YDS2bamEqcDhlFN0paM4qhPwiO91A9qDUQa5evE7S/+KEpmIzTsHFuF056epQQgn/i4MMnPr1tz9uaeBy8eJjA=="],
 
     "@hexagon/base64": ["@hexagon/base64@1.1.28", "", {}, "sha512-lhqDEAvWixy3bZ+UOYbPwUbBkwBq5C1LAJ/xPC8Oi+lL54oyakv/npbA0aU2hgCsx/1NUd4IBvV03+aUBWxerw=="],
 

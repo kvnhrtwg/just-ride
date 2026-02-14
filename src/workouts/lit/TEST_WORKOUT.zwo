@@ -1,0 +1,11 @@
+<workout_file>
+	<author>Kevin Hartwig (via TrainingPeaks)</author>
+	<name>TEST WORKOUT // 00:02 H</name>
+	<description>Test workout for Just Ride</description>
+	<sportType>bike</sportType>
+	<tags/>
+	<workout>
+		<Warmup Duration="120" PowerHigh="0.5" PowerLow="0.4">
+		</Warmup>
+	</workout>
+</workout_file>
