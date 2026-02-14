@@ -33,33 +33,19 @@
   }
 }
 
-.cp-switch--on {
-  background: rgba(0, 240, 255, 0.05);
-  color: var(--cp-accent-cyan);
-  border-color: var(--cp-accent-cyan);
-
-  &:hover:not(:disabled) {
-    background: rgba(0, 240, 255, 0.1);
-    border-color: var(--cp-accent-cyan);
-    box-shadow:
-      0 0 0.75rem rgba(0, 240, 255, 0.5),
-      0 0 2rem rgba(0, 240, 255, 0.2),
-      inset 0 0 0.75rem rgba(0, 240, 255, 0.12);
-  }
-}
-
+.cp-switch--on,
 .cp-switch--off {
-  background: rgba(255, 45, 149, 0.05);
-  color: var(--cp-accent-pink);
-  border-color: var(--cp-accent-pink);
+  background: rgba(255, 255, 255, 0.06);
+  color: #f3f2ff;
+  border-color: rgba(255, 255, 255, 0.52);
 
   &:hover:not(:disabled) {
-    background: rgba(255, 45, 149, 0.1);
-    border-color: var(--cp-accent-pink);
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.75);
     box-shadow:
-      0 0 0.75rem rgba(255, 45, 149, 0.5),
-      0 0 2rem rgba(255, 45, 149, 0.2),
-      inset 0 0 0.75rem rgba(255, 45, 149, 0.12);
+      0 0 0.75rem rgba(255, 255, 255, 0.32),
+      0 0 2rem rgba(255, 255, 255, 0.14),
+      inset 0 0 0.75rem rgba(255, 255, 255, 0.08);
   }
 }
 

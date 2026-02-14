@@ -1,0 +1,50 @@
+<workout_file>
+    <author>aionathletics.com</author>
+    <name>3x9' Progressive Climbing</name>
+    <description>3x9' progressive climbing strength.
+ Its great for off-season/base period as you highly address your muscles without producing high lactate values! This is a tremendous advantage! Only do this workout if your joints/knees are fine and if you fit on your bike correctly. The negative effects of a wrong framesize or wrong bikefit are amplified by this workout. Do this workout once a week, best Saturdays before your long Sunday base ride on Zwift!</description>
+    <sportType>bike</sportType>
+    <tags>
+        <tag name="INTERVALS"/>
+        <tag name="aionathletics.com"/>
+    </tags>
+    <workout>
+        <Warmup Duration="900" PowerLow="0.2445" PowerHigh="0.70449996">
+            <textevent timeoffset="29.068319" message="easy spinning here. have fun!"/>
+        </Warmup>
+        <SteadyState Duration="180" Power="0.80449992" Cadence="60">
+            <textevent timeoffset="5" message="start slightly grinding! 60 rpm"/>
+        </SteadyState>
+        <SteadyState Duration="180" Power="0.87449998" Cadence="60">
+            <textevent timeoffset="5" message="some more pressure!"/>
+        </SteadyState>
+        <SteadyState Duration="180" Power="0.94485819" Cadence="60">
+            <textevent timeoffset="5" message="there u go! GRIND!"/>
+        </SteadyState>
+        <SteadyState Duration="720" Power="0.55449998">
+            <textevent timeoffset="16.322721" message="relax&amp; let the blood flow back"/>
+        </SteadyState>
+        <SteadyState Duration="180" Power="0.80449992">
+            <textevent timeoffset="5" message="start grinding, 60-70rpm"/>
+        </SteadyState>
+        <SteadyState Duration="180" Power="0.87449998">
+            <textevent timeoffset="5" message="stay seated!"/>
+        </SteadyState>
+        <SteadyState Duration="180" Power="0.94449997">
+            <textevent timeoffset="5" message="..and grind on!"/>
+        </SteadyState>
+        <SteadyState Duration="720" Power="0.55449998">
+            <textevent timeoffset="38" message="blood returns :D"/>
+        </SteadyState>
+        <SteadyState Duration="180" Power="0.80449992">
+            <textevent timeoffset="5" message="one more time! GRIND"/>
+        </SteadyState>
+        <SteadyState Duration="180" Power="0.87449998">
+            <textevent timeoffset="5" message="stay seated!"/>
+        </SteadyState>
+        <SteadyState Duration="180" Power="0.94449997">
+            <textevent timeoffset="5.000021" message="pressurize your kettle! "/>
+        </SteadyState>
+        <Cooldown Duration="720" PowerLow="0.6045" PowerHigh="0.25"/>
+    </workout>
+</workout_file>

@@ -1,0 +1,28 @@
+<workout_file>
+    <author>ODZwifters</author>
+    <name>ODZwifters - Resolutions Day 1</name>
+    <description>This workout was designed to get riders on track for the new year and motivated for the next season.  It also can be used anytime in the year once a week to keep on top of a riders FTP progression but as a new years challenge it is designed to be done in 3 consecutive days.
+
+This workout is 15min at 100% FTP with 5min rest x 3
+</description>
+    <sportType>bike</sportType>
+    <category>ODZwifters</category>
+    <tags>
+        <tag name="FTP"/>
+    </tags>
+    <workout>
+        <SteadyState Duration="360.00003" Power="0.50449997">
+            <textevent timeoffset="0" message="Small Chainring ~ 90rpm"/>
+        </SteadyState>
+        <Ramp Duration="60.000004" PowerLow="0.50449991" PowerHigh="0.72449994">
+            <textevent timeoffset="0" message="Large Chainring ~90rpm"/>
+        </Ramp>
+        <SteadyState Duration="300" Power="0.72449994"/>
+        <Ramp Duration="60.000004" PowerLow="0.72449994" PowerHigh="0.96449995">
+            <textevent timeoffset="0" message="Large Chainring ~90rpm"/>
+        </Ramp>
+        <SteadyState Duration="120.00001" Power="0.96449995"/>
+        <FreeRide Duration="120.00001" FlatRoad="1"/>
+        <IntervalsT Repeat="3" OnDuration="900" OffDuration="300" OnPower="1.0044999" OffPower="0.40450001"/>
+    </workout>
+</workout_file>

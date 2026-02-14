@@ -1,0 +1,16 @@
+<workout_file>
+    <author>L.Messineo | Poison Dart Frog</author>
+    <name>6. Interval 6x2' x 30"</name>
+    <description>A short warmup into 6x2 minutes at 112% with a short but manageable 30s at 55% recovery. Cooldown as needed.</description>
+    <sportType>bike</sportType>
+    <tags>
+        <tag name="INTERVALS"/>
+        <tag name="TT"/>
+    </tags>
+    <workout>
+        <Warmup Duration="420.00003" PowerLow="0.24985027" PowerHigh="0.74985027" pace="1118666752"/>
+        <IntervalsT Repeat="6" OnDuration="120.00001" OffDuration="30.000002" OnPower="1.1444999" OffPower="0.2545" pace="1118666752"/>
+        <SteadyState Duration="420" Power="0.57306629" pace="1118666752"/>
+        <Cooldown Duration="180.00002" PowerLow="0.57271427" PowerHigh="0.36128575" pace="1118666752"/>
+    </workout>
+</workout_file>

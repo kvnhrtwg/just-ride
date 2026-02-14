@@ -10,6 +10,7 @@ import { useTrainerBluetooth } from '@/hooks/useTrainerBluetooth'
 import { ConnectionPanels } from '@/components/ConnectionPanels'
 import { ErgControlStrip } from '@/components/ErgControlStrip'
 import { StatusBar } from '@/components/StatusBar'
+import { WorkoutSelector } from '@/components/WorkoutSelector'
 
 const currentUserQuery = convexQuery(api.auth.getCurrentUser, {})
 const userDataQuery = convexQuery(api.userData.getCurrentUserData, {})
@@ -92,12 +93,14 @@ function Home() {
           disconnectHeartRateMonitor={disconnectHeartRateMonitor}
         />
 
-        <ErgControlStrip
+        {/* <ErgControlStrip
           ergTargetWatts={ergTargetWatts}
           setErgTargetWatts={setErgTargetWatts}
           setErgTarget={setErgTarget}
           connectionState={connectionState}
-        />
+        /> */}
+
+        <WorkoutSelector ftp={userData.ftp} />
 
         <StatusBar
           connectionState={connectionState}
