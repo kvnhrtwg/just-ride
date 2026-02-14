@@ -112,6 +112,17 @@
   letter-spacing: 0.1em;
   padding: v.$cp-space-2 v.$cp-space-3;
   cursor: pointer;
+  transition:
+    border-color v.$cp-transition-fast,
+    box-shadow v.$cp-transition-fast,
+    color v.$cp-transition-fast,
+    opacity v.$cp-transition-fast;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+    box-shadow: none;
+  }
 }
 
 .cp-workout-action--detail {
@@ -119,71 +130,18 @@
   color: var(--cp-accent-cyan);
 }
 
-.cp-workout-detail {
-  display: grid;
-  gap: v.$cp-space-2;
-  background: rgba(v.$cp-bg-base, 0.8);
-  margin-top: 1rem;
-  padding: v.$cp-space-1;
-}
-
-.cp-workout-plot {
-  width: 100%;
-  height: 7rem;
-  display: block;
-}
-
-.cp-workout-plot-container {
-  position: relative;
-}
-
-.cp-workout-ref-line {
-  stroke: rgba(v.$cp-white, 0.25);
-  stroke-width: 0.2;
-}
-
-.cp-workout-ref-label {
-  position: absolute;
-  left: 0;
-  transform: translateY(-85%);
-  font-size: 0.75rem;
-  letter-spacing: 0.06em;
-  color: var(--cp-text-muted);
-  pointer-events: none;
-}
-
-.cp-workout-segment-group {
-  transition: filter 140ms ease;
-}
-
-.cp-workout-segment-group--active {
-  filter: brightness(1.35);
-}
-
-.cp-workout-segment-readout {
-  margin: 0;
-  display: grid;
-  gap: v.$cp-space-1;
-  border: v.$cp-border-thin solid rgba(v.$cp-white, 0.12);
-  background: rgba(v.$cp-bg-base, 0.7);
-  padding: v.$cp-space-2 v.$cp-space-2;
-}
-
-.cp-workout-segment-title,
-.cp-workout-segment-power {
-  margin: 0;
-  font-size: 0.75rem;
-}
-
-.cp-workout-segment-title {
-  color: v.$cp-text-bright;
-}
-
-.cp-workout-segment-power {
+.cp-workout-action--start {
+  border-color: rgba(v.$cp-accent-yellow, 0.55);
   color: var(--cp-accent-yellow);
 }
 
 .cp-workout-empty {
+  margin: 0;
+  color: var(--cp-text-muted);
+  font-size: 0.75rem;
+}
+
+.cp-workout-helper {
   margin: 0;
   color: var(--cp-text-muted);
   font-size: 0.75rem;

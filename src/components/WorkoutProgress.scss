@@ -1,0 +1,185 @@
+@use '../variables' as v;
+
+.cp-workout-progress {
+  display: grid;
+  gap: v.$cp-space-3;
+  margin-bottom: v.$cp-space-2;
+}
+
+.cp-workout-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: v.$cp-space-3;
+
+  h2 {
+    margin: 0;
+    color: v.$cp-text-bright;
+    font-size: 1.1rem;
+    letter-spacing: 0.03em;
+  }
+}
+
+.cp-workout-progress-title-wrap {
+  display: grid;
+  gap: v.$cp-space-1;
+}
+
+.cp-workout-progress-state {
+  margin: 0;
+  font-family: v.$cp-font-display;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: v.$cp-border-thin solid rgba(v.$cp-white, 0.34);
+  padding: v.$cp-space-1 v.$cp-space-2;
+}
+
+.cp-workout-progress-state--running {
+  color: var(--cp-accent-cyan);
+  border-color: rgba(v.$cp-accent-cyan, 0.52);
+}
+
+.cp-workout-progress-state--paused {
+  color: var(--cp-accent-yellow);
+  border-color: rgba(v.$cp-accent-yellow, 0.52);
+}
+
+.cp-workout-progress-state--waiting {
+  color: var(--cp-accent-yellow);
+  border-color: rgba(v.$cp-accent-yellow, 0.52);
+}
+
+.cp-workout-progress-state--completed {
+  color: var(--cp-accent-purple);
+  border-color: rgba(v.$cp-accent-purple, 0.52);
+}
+
+.cp-workout-progress-waiting {
+  margin: 0;
+  color: var(--cp-text-secondary);
+  font-size: 0.8125rem;
+}
+
+.cp-workout-progress-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: v.$cp-space-2;
+}
+
+.cp-workout-progress-metric {
+  display: grid;
+  gap: v.$cp-space-1;
+  background: rgba(v.$cp-bg-base, 0.72);
+  border: v.$cp-border-thin solid rgba(v.$cp-white, 0.12);
+  padding: v.$cp-space-2;
+
+  p {
+    margin: 0;
+  }
+
+  p:last-child {
+    color: v.$cp-text-bright;
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+  }
+}
+
+.cp-workout-progress-bar {
+  width: 100%;
+  height: 0.75rem;
+  border: v.$cp-border-thin solid rgba(v.$cp-accent-cyan, 0.42);
+  background: rgba(v.$cp-bg-base, 0.82);
+  overflow: hidden;
+
+  span {
+    display: block;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      rgba(v.$cp-accent-cyan, 0.7),
+      rgba(v.$cp-accent-purple, 0.72)
+    );
+    transition: width 300ms ease;
+  }
+}
+
+.cp-workout-progress-segments {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: v.$cp-space-2;
+}
+
+.cp-workout-progress-segment {
+  display: grid;
+  gap: v.$cp-space-1;
+  border: v.$cp-border-thin solid rgba(v.$cp-white, 0.12);
+  background: rgba(v.$cp-bg-base, 0.72);
+  padding: v.$cp-space-2;
+
+  h3,
+  p {
+    margin: 0;
+  }
+
+  h3 {
+    color: v.$cp-text-bright;
+    font-size: 0.95rem;
+  }
+
+  p {
+    color: var(--cp-text-secondary);
+    font-size: 0.8125rem;
+  }
+
+  p.cp-panel-label {
+    color: var(--cp-text-muted);
+  }
+}
+
+.cp-workout-progress-empty {
+  color: var(--cp-text-muted);
+}
+
+.cp-workout-progress-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: v.$cp-space-2;
+}
+
+.cp-workout-progress-action {
+  border: v.$cp-border-thin solid rgba(v.$cp-accent-cyan, 0.55);
+  background: v.$cp-surface-input;
+  color: var(--cp-accent-cyan);
+  font-family: v.$cp-font-display;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: v.$cp-space-2 v.$cp-space-3;
+  cursor: pointer;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+  }
+}
+
+.cp-workout-progress-action--secondary {
+  border-color: rgba(v.$cp-accent-yellow, 0.55);
+  color: var(--cp-accent-yellow);
+}
+
+.cp-workout-progress-action--danger {
+  border-color: rgba(v.$cp-accent-pink, 0.55);
+  color: var(--cp-accent-pink);
+}
+
+@media (max-width: v.$cp-breakpoint-md) {
+  .cp-workout-progress-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cp-workout-progress-segments {
+    grid-template-columns: 1fr;
+  }
+}

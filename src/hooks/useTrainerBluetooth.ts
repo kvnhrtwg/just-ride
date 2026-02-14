@@ -80,13 +80,17 @@ function parseCyclingPowerMeasurement(value: DataView): number | null {
   return value.getInt16(2, true)
 }
 
-function parseIndoorBikeData(value: DataView): number | null {
+function parseIndoorBikeData(value: DataView): {
+  powerWatts: number | null
+  cadenceRpm: number | null
+} {
   if (value.byteLength < 2) {
-    return null
+    return { powerWatts: null, cadenceRpm: null }
   }
 
   const flags = value.getUint16(0, true)
   let offset = 2
+  let cadenceRpm: number | null = null
 
   if ((flags & 0x01) === 0) {
     offset += 2
@@ -95,6 +99,10 @@ function parseIndoorBikeData(value: DataView): number | null {
     offset += 2
   }
   if (flags & 0x04) {
+    if (value.byteLength < offset + 2) {
+      return { powerWatts: null, cadenceRpm: null }
+    }
+    cadenceRpm = value.getUint16(offset, true) / 2
     offset += 2
   }
   if (flags & 0x08) {
@@ -109,12 +117,83 @@ function parseIndoorBikeData(value: DataView): number | null {
 
   if (flags & 0x40) {
     if (value.byteLength < offset + 2) {
-      return null
+      return { powerWatts: null, cadenceRpm }
     }
-    return value.getInt16(offset, true)
+    return {
+      powerWatts: value.getInt16(offset, true),
+      cadenceRpm,
+    }
   }
 
-  return null
+  return { powerWatts: null, cadenceRpm }
+}
+
+function parseCyclingPowerCadence(value: DataView): {
+  cumulativeCrankRevolutions: number | null
+  lastCrankEventTime: number | null
+} {
+  if (value.byteLength < 4) {
+    return {
+      cumulativeCrankRevolutions: null,
+      lastCrankEventTime: null,
+    }
+  }
+
+  const flags = value.getUint16(0, true)
+  let offset = 4
+
+  if (flags & 0x01) {
+    offset += 1
+  }
+  if (flags & 0x04) {
+    offset += 2
+  }
+  if (flags & 0x10) {
+    offset += 6
+  }
+  if ((flags & 0x20) === 0 || value.byteLength < offset + 4) {
+    return {
+      cumulativeCrankRevolutions: null,
+      lastCrankEventTime: null,
+    }
+  }
+
+  return {
+    cumulativeCrankRevolutions: value.getUint16(offset, true),
+    lastCrankEventTime: value.getUint16(offset + 2, true),
+  }
+}
+
+function getDeltaUint16(current: number, previous: number): number {
+  if (current >= previous) {
+    return current - previous
+  }
+  return current + 0x10000 - previous
+}
+
+function computeCadenceFromCrank(
+  cumulativeCrankRevolutions: number | null,
+  lastCrankEventTime: number | null,
+  previousCrankRevolutions: number | null,
+  previousCrankEventTime: number | null
+): number | null {
+  if (
+    cumulativeCrankRevolutions === null ||
+    lastCrankEventTime === null ||
+    previousCrankRevolutions === null ||
+    previousCrankEventTime === null
+  ) {
+    return null
+  }
+
+  const crankDelta = getDeltaUint16(cumulativeCrankRevolutions, previousCrankRevolutions)
+  const timeDelta = getDeltaUint16(lastCrankEventTime, previousCrankEventTime)
+
+  if (timeDelta <= 0) {
+    return null
+  }
+
+  return (crankDelta * 60 * 1024) / timeDelta
 }
 
 function parseHeartRateMeasurement(value: DataView): number | null {
@@ -150,12 +229,18 @@ export type BluetoothDashboardModel = {
   statusMessage: string
   connectionState: ConnectionState
   heartRateConnectionState: ConnectionState
+  ergControlAvailable: boolean
   trainerName: string
   heartRateMonitorName: string
   livePowerWatts: number | null
+  cadenceRpm: number | null
   heartRateBpm: number | null
   ergTargetWatts: number
   setErgTargetWatts: (value: number) => void
+  setErgTargetValue: (
+    value: number,
+    options?: { announce?: boolean }
+  ) => Promise<boolean>
   connectTrainer: () => Promise<void>
   disconnectTrainer: () => void
   connectHeartRateMonitor: () => Promise<void>
@@ -183,6 +268,7 @@ export function useTrainerBluetooth(
   const [connectionState, setConnectionState] = useState<ConnectionState>('idle')
   const [heartRateConnectionState, setHeartRateConnectionState] =
     useState<ConnectionState>('idle')
+  const [ergControlAvailable, setErgControlAvailable] = useState(false)
   const [statusMessage, setStatusMessage] = useState(
     'Connect your smart trainer to start receiving live power.'
   )
@@ -191,6 +277,7 @@ export function useTrainerBluetooth(
     'No HR monitor connected'
   )
   const [livePowerWatts, setLivePowerWatts] = useState<number | null>(null)
+  const [cadenceRpm, setCadenceRpm] = useState<number | null>(null)
   const [heartRateBpm, setHeartRateBpm] = useState<number | null>(null)
   const [ergTargetWatts, setErgTargetWatts] = useState(initialErgTargetWatts)
 
@@ -200,6 +287,8 @@ export function useTrainerBluetooth(
   const hrDeviceRef = useRef<BluetoothDevice | null>(null)
   const hrCharacteristicRef = useRef<BluetoothRemoteGATTCharacteristic | null>(null)
   const payloadTypeRef = useRef<PowerPayloadType>('cycling-power')
+  const lastCrankRevolutionsRef = useRef<number | null>(null)
+  const lastCrankEventTimeRef = useRef<number | null>(null)
 
   useEffect(() => {
     setWebBluetoothSupported(Boolean(getNavigatorBluetooth()))
@@ -216,16 +305,37 @@ export function useTrainerBluetooth(
       return
     }
 
-    const watts =
-      payloadTypeRef.current === 'cycling-power'
-        ? parseCyclingPowerMeasurement(value)
-        : parseIndoorBikeData(value)
+    let watts: number | null = null
+    let cadence: number | null = null
+
+    if (payloadTypeRef.current === 'cycling-power') {
+      watts = parseCyclingPowerMeasurement(value)
+      const { cumulativeCrankRevolutions, lastCrankEventTime } =
+        parseCyclingPowerCadence(value)
+      cadence = computeCadenceFromCrank(
+        cumulativeCrankRevolutions,
+        lastCrankEventTime,
+        lastCrankRevolutionsRef.current,
+        lastCrankEventTimeRef.current
+      )
+      if (cumulativeCrankRevolutions !== null && lastCrankEventTime !== null) {
+        lastCrankRevolutionsRef.current = cumulativeCrankRevolutions
+        lastCrankEventTimeRef.current = lastCrankEventTime
+      }
+    } else {
+      const parsedIndoorData = parseIndoorBikeData(value)
+      watts = parsedIndoorData.powerWatts
+      cadence = parsedIndoorData.cadenceRpm
+    }
 
     if (watts === null || Number.isNaN(watts)) {
       return
     }
 
     setLivePowerWatts(Math.max(0, Math.round(watts)))
+    if (cadence !== null && Number.isFinite(cadence)) {
+      setCadenceRpm(Math.max(0, Math.round(cadence)))
+    }
   }, [])
 
   const handleHeartRateNotification = useCallback((event: Event) => {
@@ -254,10 +364,14 @@ export function useTrainerBluetooth(
 
     powerCharacteristicRef.current = null
     controlCharacteristicRef.current = null
+    setErgControlAvailable(false)
     trainerDeviceRef.current = null
     setConnectionState('idle')
     setTrainerName('No trainer connected')
     setLivePowerWatts(null)
+    setCadenceRpm(null)
+    lastCrankRevolutionsRef.current = null
+    lastCrankEventTimeRef.current = null
     setStatusMessage('Trainer disconnected.')
   }, [handlePowerNotification])
 
@@ -347,6 +461,8 @@ export function useTrainerBluetooth(
       setTrainerName(device.name ?? 'Unnamed trainer')
       setConnectionState('connected')
       setStatusMessage('Connected. Streaming live power data.')
+      lastCrankRevolutionsRef.current = null
+      lastCrankEventTimeRef.current = null
 
       try {
         const fitnessMachineService = await server.getPrimaryService(
@@ -356,9 +472,11 @@ export function useTrainerBluetooth(
           FITNESS_MACHINE_CONTROL_POINT_UUID
         )
         controlCharacteristicRef.current = controlPoint
+        setErgControlAvailable(true)
         await writeFtmsCommand(Uint8Array.of(REQUEST_CONTROL_OPCODE))
       } catch {
         controlCharacteristicRef.current = null
+        setErgControlAvailable(false)
         setStatusMessage(
           'Connected for power reading. FTMS control point not available in this session.'
         )
@@ -390,6 +508,7 @@ export function useTrainerBluetooth(
     }
 
     controlCharacteristicRef.current = null
+    setErgControlAvailable(false)
 
     if (device) {
       device.removeEventListener('gattserverdisconnected', handleTrainerDisconnected)
@@ -402,6 +521,9 @@ export function useTrainerBluetooth(
     setConnectionState('idle')
     setTrainerName('No trainer connected')
     setLivePowerWatts(null)
+    setCadenceRpm(null)
+    lastCrankRevolutionsRef.current = null
+    lastCrankEventTimeRef.current = null
     setStatusMessage('Trainer disconnected.')
   }, [handlePowerNotification, handleTrainerDisconnected])
 
@@ -485,29 +607,51 @@ export function useTrainerBluetooth(
     setHeartRateBpm(null)
   }, [handleHeartRateMonitorDisconnected, handleHeartRateNotification])
 
+  const setErgTargetValue = useCallback(
+    async (
+      value: number,
+      options: {
+        announce?: boolean
+      } = {}
+    ) => {
+      const { announce = true } = options
+      const target = Math.round(value)
+      if (!Number.isFinite(target) || target < 0 || target > 2000) {
+        setStatusMessage('Choose a target between 0 and 2000 watts.')
+        return false
+      }
+
+      if (!controlCharacteristicRef.current) {
+        setStatusMessage('ERG control unavailable: no FTMS control point found.')
+        return false
+      }
+
+      try {
+        await writeFtmsCommand(encodeSetTargetPower(target))
+        if (announce) {
+          setStatusMessage(`ERG target set to ${target} W.`)
+        }
+        return true
+      } catch (error) {
+        const message =
+          error instanceof Error && error.message
+            ? error.message
+            : 'Failed to set ERG target.'
+        setStatusMessage(message)
+        return false
+      }
+    },
+    [writeFtmsCommand]
+  )
+
   const setErgTarget = useCallback(async () => {
     const target = Math.round(ergTargetWatts)
     if (!Number.isFinite(target) || target < 0 || target > 2000) {
       setStatusMessage('Choose a target between 0 and 2000 watts.')
       return
     }
-
-    if (!controlCharacteristicRef.current) {
-      setStatusMessage('ERG control unavailable: no FTMS control point found.')
-      return
-    }
-
-    try {
-      await writeFtmsCommand(encodeSetTargetPower(target))
-      setStatusMessage(`ERG target set to ${target} W.`)
-    } catch (error) {
-      const message =
-        error instanceof Error && error.message
-          ? error.message
-          : 'Failed to set ERG target.'
-      setStatusMessage(message)
-    }
-  }, [ergTargetWatts, writeFtmsCommand])
+    await setErgTargetValue(target)
+  }, [ergTargetWatts, setErgTargetValue])
 
   useEffect(() => {
     return () => {
@@ -542,12 +686,15 @@ export function useTrainerBluetooth(
     statusMessage,
     connectionState,
     heartRateConnectionState,
+    ergControlAvailable,
     trainerName,
     heartRateMonitorName,
     livePowerWatts,
+    cadenceRpm,
     heartRateBpm,
     ergTargetWatts,
     setErgTargetWatts,
+    setErgTargetValue,
     connectTrainer,
     disconnectTrainer,
     connectHeartRateMonitor,

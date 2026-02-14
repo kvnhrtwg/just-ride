@@ -3,6 +3,7 @@ import "./MetricCards.scss";
 
 type MetricCardsProps = {
   livePowerWatts: number | null;
+  cadenceRpm: number | null;
   trainerName: string;
   connectionState: ConnectionState;
   heartRateBpm: number | null;
@@ -19,6 +20,7 @@ function badgeClass(state: string): string {
 
 export function MetricCards({
   livePowerWatts,
+  cadenceRpm,
   trainerName,
   connectionState,
   heartRateBpm,
@@ -33,6 +35,10 @@ export function MetricCards({
           <span className="cp-big-number">{livePowerWatts ?? "--"}</span>
           <span className="cp-unit">W</span>
         </h2>
+        <p className="cp-inline-metric">
+          <span className="cp-inline-metric-label">Cadence</span>
+          <span className="cp-inline-metric-value">{cadenceRpm ?? "--"} RPM</span>
+        </p>
         <span className="cp-device-name">{trainerName}</span>
         <span className={badgeClass(connectionState)}>{connectionState}</span>
       </article>

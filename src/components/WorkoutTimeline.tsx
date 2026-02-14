@@ -1,0 +1,333 @@
+import { useMemo, useState } from 'react'
+import type { WorkoutDefinition, WorkoutSegment } from '@/workouts/catalog'
+import './WorkoutTimeline.scss'
+
+type WorkoutTimelineProps = {
+  workout: WorkoutDefinition
+  ftp: number
+  elapsedSeconds?: number
+  interactive?: boolean
+  showTimescale?: boolean
+}
+
+type WorkoutZone = 1 | 2 | 3 | 4 | 5 | 6
+
+const WORKOUT_PLOT_WIDTH = 100
+const WORKOUT_PLOT_HEIGHT = 34
+const WORKOUT_PLOT_BASELINE = 32
+const WORKOUT_PLOT_TOP_PADDING = 2
+const WORKOUT_SEGMENT_GAP = 0.18
+
+const ZONE_COLORS: Record<WorkoutZone, string> = {
+  1: '#e0d4f5',
+  2: '#00f0ff',
+  3: '#ffe600',
+  4: '#ff2d95',
+  5: '#ff3b30',
+  6: '#b000ff',
+}
+
+export function WorkoutTimeline({
+  workout,
+  ftp,
+  elapsedSeconds,
+  interactive = true,
+  showTimescale = false,
+}: WorkoutTimelineProps) {
+  const [hoveredSegmentId, setHoveredSegmentId] = useState<string | null>(null)
+  const { geometries: segmentGeometries, maxFtp } = useMemo(
+    () => buildSegmentGeometries(workout.id, workout.segments),
+    [workout.id, workout.segments]
+  )
+
+  const elapsedSegment = useMemo(() => {
+    if (typeof elapsedSeconds !== 'number') {
+      return null
+    }
+    const elapsed = clamp(elapsedSeconds, 0, workout.totalDurationSeconds)
+    return (
+      workout.segments.find((segment) => {
+        const segmentEnd = segment.startSecond + segment.durationSeconds
+        return elapsed >= segment.startSecond && elapsed < segmentEnd
+      }) ?? workout.segments.at(-1) ?? null
+    )
+  }, [elapsedSeconds, workout.segments, workout.totalDurationSeconds])
+
+  const selectedSegment = useMemo(() => {
+    if (interactive && hoveredSegmentId) {
+      return (
+        workout.segments.find((segment) => segment.id === hoveredSegmentId) ??
+        elapsedSegment ??
+        workout.segments[0] ??
+        null
+      )
+    }
+
+    return elapsedSegment ?? workout.segments[0] ?? null
+  }, [elapsedSegment, hoveredSegmentId, interactive, workout.segments])
+
+  const maxLineY = getSegmentTopY(maxFtp, maxFtp)
+  const maxWatts = Math.round(maxFtp * ftp)
+  const clampedElapsed =
+    typeof elapsedSeconds === 'number'
+      ? clamp(elapsedSeconds, 0, workout.totalDurationSeconds)
+      : null
+  const progressMarkerX =
+    clampedElapsed === null
+      ? null
+      : getElapsedPositionX({
+          elapsedSeconds: clampedElapsed,
+          geometries: segmentGeometries,
+          totalDurationSeconds: workout.totalDurationSeconds,
+        })
+
+  if (workout.segments.length === 0) {
+    return <p className="cp-workout-empty">This workout has no parsable sections yet.</p>
+  }
+
+  return (
+    <section className="cp-workout-detail">
+      <div className="cp-workout-plot-container">
+        <svg
+          className="cp-workout-plot"
+          viewBox={`0 0 ${WORKOUT_PLOT_WIDTH} ${WORKOUT_PLOT_HEIGHT}`}
+          preserveAspectRatio="none"
+          onMouseLeave={
+            interactive
+              ? () => {
+                  setHoveredSegmentId(null)
+                }
+              : undefined
+          }
+          aria-label={`Workout profile for ${workout.title}`}
+        >
+          <defs>
+            {segmentGeometries.map((geometry) => (
+              <linearGradient
+                key={`${geometry.segment.id}-gradient`}
+                id={geometry.gradientId}
+                x1="0%"
+                x2="100%"
+                y1="0%"
+                y2="0%"
+              >
+                <stop offset="0%" stopColor={getZoneColor(geometry.segment.ftpLow)} />
+                <stop offset="100%" stopColor={getZoneColor(geometry.segment.ftpHigh)} />
+              </linearGradient>
+            ))}
+          </defs>
+
+          <line
+            x1={0}
+            y1={maxLineY}
+            x2={WORKOUT_PLOT_WIDTH}
+            y2={maxLineY}
+            className="cp-workout-ref-line"
+          />
+
+          {segmentGeometries.map((geometry) => {
+            const isActive = selectedSegment?.id === geometry.segment.id
+            return (
+              <g
+                key={geometry.segment.id}
+                className={`cp-workout-segment-group ${
+                  isActive ? 'cp-workout-segment-group--active' : ''
+                }`}
+              >
+                <path
+                  d={geometry.path}
+                  className="cp-workout-segment-shape"
+                  fill={`url(#${geometry.gradientId})`}
+                />
+                {interactive ? (
+                  <rect
+                    x={geometry.x}
+                    y={0}
+                    width={geometry.width}
+                    height={WORKOUT_PLOT_HEIGHT}
+                    fill="transparent"
+                    onMouseEnter={() => setHoveredSegmentId(geometry.segment.id)}
+                  />
+                ) : null}
+              </g>
+            )
+          })}
+
+          {progressMarkerX !== null ? (
+            <line
+              x1={progressMarkerX}
+              y1={0}
+              x2={progressMarkerX}
+              y2={WORKOUT_PLOT_HEIGHT}
+              className="cp-workout-progress-marker"
+            />
+          ) : null}
+        </svg>
+        <span
+          className="cp-workout-ref-label"
+          style={{ top: `${(maxLineY / WORKOUT_PLOT_HEIGHT) * 100}%` }}
+        >
+          {maxWatts} W
+        </span>
+      </div>
+
+      {showTimescale ? (
+        <div className="cp-workout-timescale">
+          <span>0:00</span>
+          <span>{formatDuration(Math.round(workout.totalDurationSeconds / 2))}</span>
+          <span>{formatDuration(workout.totalDurationSeconds)}</span>
+        </div>
+      ) : null}
+
+      {selectedSegment ? (
+        <div className="cp-workout-segment-readout">
+          <p className="cp-workout-segment-title">
+            {selectedSegment.label} - {formatDuration(selectedSegment.durationSeconds)}
+          </p>
+          <p className="cp-workout-segment-power">
+            {formatSegmentPower(selectedSegment, ftp)} - Zone {getZoneFromFtp(getMidFtp(selectedSegment))}
+          </p>
+          {clampedElapsed !== null ? (
+            <p className="cp-workout-segment-time">
+              {formatDuration(clampedElapsed)} / {formatDuration(workout.totalDurationSeconds)}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
+    </section>
+  )
+}
+
+type SegmentGeometry = {
+  segment: WorkoutSegment
+  x: number
+  width: number
+  gradientId: string
+  path: string
+}
+
+function getElapsedPositionX({
+  elapsedSeconds,
+  geometries,
+  totalDurationSeconds,
+}: {
+  elapsedSeconds: number
+  geometries: SegmentGeometry[]
+  totalDurationSeconds: number
+}): number {
+  if (geometries.length === 0 || totalDurationSeconds <= 0) {
+    return 0
+  }
+
+  const clampedElapsed = clamp(elapsedSeconds, 0, totalDurationSeconds)
+  for (const geometry of geometries) {
+    const segmentStart = geometry.segment.startSecond
+    const segmentEnd = segmentStart + geometry.segment.durationSeconds
+    if (clampedElapsed <= segmentEnd) {
+      const segmentProgress = clamp(
+        (clampedElapsed - segmentStart) / Math.max(1, geometry.segment.durationSeconds),
+        0,
+        1
+      )
+      return geometry.x + geometry.width * segmentProgress
+    }
+  }
+
+  return WORKOUT_PLOT_WIDTH
+}
+
+function getMidFtp(segment: WorkoutSegment): number {
+  return (segment.ftpLow + segment.ftpHigh) / 2
+}
+
+function getZoneFromFtp(ftpRatio: number): WorkoutZone {
+  if (ftpRatio < 0.56) return 1
+  if (ftpRatio < 0.76) return 2
+  if (ftpRatio < 0.91) return 3
+  if (ftpRatio < 1.06) return 4
+  if (ftpRatio < 1.21) return 5
+  return 6
+}
+
+function getZoneColor(ftpRatio: number): string {
+  return ZONE_COLORS[getZoneFromFtp(ftpRatio)]
+}
+
+function buildSegmentGeometries(workoutId: string, segments: WorkoutSegment[]) {
+  const totalDuration = Math.max(
+    1,
+    segments.reduce((total, segment) => total + segment.durationSeconds, 0)
+  )
+  const maxFtp = Math.max(
+    0.01,
+    ...segments.flatMap((segment) => [segment.ftpLow, segment.ftpHigh])
+  )
+  const totalGap = Math.max(0, segments.length - 1) * WORKOUT_SEGMENT_GAP
+  const availableWidth = WORKOUT_PLOT_WIDTH - totalGap
+  let cursorX = 0
+
+  const geometries = segments.map((segment) => {
+    const width = Math.max(0.35, (segment.durationSeconds / totalDuration) * availableWidth)
+    const leftY = getSegmentTopY(segment.ftpLow, maxFtp)
+    const rightY = getSegmentTopY(segment.ftpHigh, maxFtp)
+    const x = cursorX
+    cursorX += width + WORKOUT_SEGMENT_GAP
+
+    return {
+      segment,
+      x,
+      width,
+      gradientId: `cp-workout-${workoutId}-${segment.id}`,
+      path: getSegmentPath(x, width, leftY, rightY),
+    }
+  })
+
+  return { geometries, maxFtp }
+}
+
+function getSegmentPath(x: number, width: number, leftY: number, rightY: number): string {
+  const bottom = WORKOUT_PLOT_BASELINE
+  const leftTop = clamp(leftY, WORKOUT_PLOT_TOP_PADDING, bottom)
+  const rightTop = clamp(rightY, WORKOUT_PLOT_TOP_PADDING, bottom)
+
+  return `M ${x} ${bottom} L ${x + width} ${bottom} L ${x + width} ${rightTop} L ${x} ${leftTop} Z`
+}
+
+function getSegmentTopY(ftpRatio: number, maxFtp: number): number {
+  const minY = WORKOUT_PLOT_TOP_PADDING
+  const maxY = WORKOUT_PLOT_BASELINE - 1.5
+  const normalized = clamp(ftpRatio / maxFtp, 0, 1)
+  const y = maxY - normalized * (maxY - minY)
+  return clamp(y, minY, maxY)
+}
+
+function formatSegmentPower(segment: WorkoutSegment, ftp: number): string {
+  const ftpLowPercent = Math.round(segment.ftpLow * 100)
+  const ftpHighPercent = Math.round(segment.ftpHigh * 100)
+  const wattsLow = Math.round(segment.ftpLow * ftp)
+  const wattsHigh = Math.round(segment.ftpHigh * ftp)
+
+  if (ftpLowPercent === ftpHighPercent) {
+    return `${ftpLowPercent}% FTP (${wattsLow} W)`
+  }
+
+  return `${ftpLowPercent}-${ftpHighPercent}% FTP (${wattsLow}-${wattsHigh} W)`
+}
+
+function formatDuration(totalSeconds: number): string {
+  const safeTotal = Math.max(0, Math.round(totalSeconds))
+  const minutes = Math.floor(safeTotal / 60)
+  const seconds = safeTotal % 60
+
+  if (minutes < 60) {
+    return `${minutes}:${String(seconds).padStart(2, '0')}`
+  }
+
+  const hours = Math.floor(minutes / 60)
+  const remainingMinutes = minutes % 60
+  return `${hours}:${String(remainingMinutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value))
+}

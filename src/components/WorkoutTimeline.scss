@@ -1,0 +1,91 @@
+@use '../variables' as v;
+
+.cp-workout-detail {
+  display: grid;
+  gap: v.$cp-space-2;
+  background: rgba(v.$cp-bg-base, 0.8);
+  margin-top: 1rem;
+  padding: v.$cp-space-1;
+}
+
+.cp-workout-plot {
+  width: 100%;
+  height: 7rem;
+  display: block;
+}
+
+.cp-workout-plot-container {
+  position: relative;
+}
+
+.cp-workout-ref-line {
+  stroke: rgba(v.$cp-white, 0.25);
+  stroke-width: 0.2;
+}
+
+.cp-workout-ref-label {
+  position: absolute;
+  left: 0;
+  transform: translateY(-85%);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  color: var(--cp-text-muted);
+  pointer-events: none;
+}
+
+.cp-workout-progress-marker {
+  stroke: rgba(v.$cp-white, 0.9);
+  stroke-width: 0.45;
+  stroke-dasharray: 1.2 1;
+}
+
+.cp-workout-segment-group {
+  transition: filter 140ms ease;
+}
+
+.cp-workout-segment-group--active {
+  filter: brightness(1.35);
+}
+
+.cp-workout-timescale {
+  display: flex;
+  justify-content: space-between;
+  gap: v.$cp-space-2;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  color: var(--cp-text-muted);
+}
+
+.cp-workout-segment-readout {
+  margin: 0;
+  display: grid;
+  gap: v.$cp-space-1;
+  border: v.$cp-border-thin solid rgba(v.$cp-white, 0.12);
+  background: rgba(v.$cp-bg-base, 0.7);
+  padding: v.$cp-space-2 v.$cp-space-2;
+}
+
+.cp-workout-segment-title,
+.cp-workout-segment-power,
+.cp-workout-segment-time {
+  margin: 0;
+  font-size: 0.75rem;
+}
+
+.cp-workout-segment-title {
+  color: v.$cp-text-bright;
+}
+
+.cp-workout-segment-power {
+  color: var(--cp-accent-yellow);
+}
+
+.cp-workout-segment-time {
+  color: var(--cp-text-muted);
+}
+
+.cp-workout-empty {
+  margin: 0;
+  color: var(--cp-text-muted);
+  font-size: 0.75rem;
+}

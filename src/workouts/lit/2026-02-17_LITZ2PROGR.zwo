@@ -1,0 +1,25 @@
+<workout_file>
+	<author>Kevin Hartwig (via TrainingPeaks)</author>
+	<name>LIT Z2 PROGRESSIV // 1:00 H</name>
+	<description>Z2: Die gesamte Einheit sollte sich heute von Anfang bis Ende locker machbar anfühlen.
+
+Heute ist keine Kohlenhydrataufnahme erforderlich - sie ist aber auch nicht verboten. Wenn du dir also was reinsnacken willst: go for it.</description>
+	<sportType>bike</sportType>
+	<tags/>
+	<workout>
+		<Warmup Duration="420" PowerHigh="0.6" PowerLow="0.4">
+		</Warmup>
+		<SteadyState Duration="600" Power="0.62">
+		</SteadyState>
+		<SteadyState Duration="600" Power="0.66">
+		</SteadyState>
+		<SteadyState Duration="600" Power="0.68">
+		</SteadyState>
+		<SteadyState Duration="600" Power="0.72">
+		</SteadyState>
+		<SteadyState Duration="600" Power="0.76">
+		</SteadyState>
+		<Cooldown Duration="180" PowerHigh="0.33" PowerLow="0.53">
+		</Cooldown>
+	</workout>
+</workout_file>

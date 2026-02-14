@@ -3,13 +3,13 @@
 .cp-metrics {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: v.$cp-space-5;
-  margin-bottom: v.$cp-space-5;
+  gap: v.$cp-space-3;
+  margin-bottom: v.$cp-space-3;
 }
 
 .cp-card {
   position: relative;
-  padding: 1.5rem 1.25rem;
+  padding: 1rem;
   border: 2px solid;
   background: var(--cp-panel-bg);
 
@@ -31,15 +31,16 @@
 }
 
 .cp-card-label {
-  margin: 0 0 0.25rem;
+  margin: 0 0 0.125rem;
   letter-spacing: 0.18em;
   color: var(--cp-text-secondary);
+  font-size: 0.6875rem;
 }
 
 .cp-card-value {
-  margin: 0.25rem 0 0.75rem;
+  margin: 0.125rem 0 0.375rem;
   font-family: v.$cp-font-mono;
-  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-size: clamp(2rem, 4.8vw, 3.25rem);
   font-weight: 400;
   line-height: 1;
 
@@ -101,21 +102,42 @@
   letter-spacing: 0.15em;
 }
 
+.cp-inline-metric {
+  margin: 0 0 0.25rem;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  color: var(--cp-text-secondary);
+}
+
+.cp-inline-metric-label {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.625rem;
+}
+
+.cp-inline-metric-value {
+  color: var(--cp-accent-cyan);
+  font-family: v.$cp-font-mono;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+}
+
 .cp-device-name {
   display: block;
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   color: var(--cp-text-secondary);
   letter-spacing: 0.12em;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.1875rem;
 }
 
 .cp-badge {
   display: inline-block;
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 400;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  padding: 0.25rem 0.5rem;
+  padding: 0.1875rem 0.4375rem;
   border: v.$cp-border-thin solid rgba(v.$cp-white, 0.2);
   color: rgba(v.$cp-text-primary, 0.65);
   background: rgba(v.$cp-white, 0.02);
