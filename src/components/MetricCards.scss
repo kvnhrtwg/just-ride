@@ -1,8 +1,10 @@
+@use '../variables' as v;
+
 .cp-metrics {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1.25rem;
-  margin-bottom: 1.5rem;
+  gap: v.$cp-space-5;
+  margin-bottom: v.$cp-space-5;
 }
 
 .cp-card {
@@ -14,17 +16,17 @@
   &--power {
     border-color: var(--cp-accent-cyan);
     box-shadow:
-      0 0 0.5rem rgba(0, 240, 255, 0.4),
-      0 0 1.5rem rgba(0, 240, 255, 0.2),
-      inset 0 0 1rem rgba(0, 240, 255, 0.07);
+      0 0 0.5rem rgba(v.$cp-accent-cyan, 0.4),
+      0 0 1.5rem rgba(v.$cp-accent-cyan, 0.2),
+      inset 0 0 1rem rgba(v.$cp-accent-cyan, 0.07);
   }
 
   &--hr {
     border-color: var(--cp-accent-pink);
     box-shadow:
-      0 0 0.5rem rgba(255, 45, 149, 0.4),
-      0 0 1.5rem rgba(255, 45, 149, 0.2),
-      inset 0 0 1rem rgba(255, 45, 149, 0.07);
+      0 0 0.5rem rgba(v.$cp-accent-pink, 0.4),
+      0 0 1.5rem rgba(v.$cp-accent-pink, 0.2),
+      inset 0 0 1rem rgba(v.$cp-accent-pink, 0.07);
   }
 }
 
@@ -36,7 +38,7 @@
 
 .cp-card-value {
   margin: 0.25rem 0 0.75rem;
-  font-family: "Share Tech Mono", monospace;
+  font-family: v.$cp-font-mono;
   font-size: clamp(2.5rem, 6vw, 4rem);
   font-weight: 400;
   line-height: 1;
@@ -44,18 +46,18 @@
   &--power .cp-big-number {
     color: var(--cp-accent-cyan);
     text-shadow:
-      0 0 0.75rem #00f0ff,
-      0 0 2rem #00f0ff,
-      0 0 3.75rem #00f0ff;
+      0 0 0.75rem v.$cp-accent-cyan,
+      0 0 2rem v.$cp-accent-cyan,
+      0 0 3.75rem v.$cp-accent-cyan;
     animation: cp-glow-green 2.5s ease-in-out infinite alternate;
   }
 
   &--hr .cp-big-number {
     color: var(--cp-accent-pink);
     text-shadow:
-      0 0 0.75rem #ff2d95,
-      0 0 2rem #ff2d95,
-      0 0 3.75rem #ff2d95;
+      0 0 0.75rem v.$cp-accent-pink,
+      0 0 2rem v.$cp-accent-pink,
+      0 0 3.75rem v.$cp-accent-pink;
     animation: cp-glow-red 2.5s ease-in-out infinite alternate;
   }
 }
@@ -63,30 +65,30 @@
 @keyframes cp-glow-green {
   0% {
     text-shadow:
-      0 0 0.75rem #00f0ff,
-      0 0 2rem #00f0ff,
-      0 0 3.75rem #00f0ff;
+      0 0 0.75rem v.$cp-accent-cyan,
+      0 0 2rem v.$cp-accent-cyan,
+      0 0 3.75rem v.$cp-accent-cyan;
   }
   100% {
     text-shadow:
-      0 0 0.5rem #00f0ff,
-      0 0 1.25rem #00f0ff,
-      0 0 2.5rem #00f0ff;
+      0 0 0.5rem v.$cp-accent-cyan,
+      0 0 1.25rem v.$cp-accent-cyan,
+      0 0 2.5rem v.$cp-accent-cyan;
   }
 }
 
 @keyframes cp-glow-red {
   0% {
     text-shadow:
-      0 0 0.75rem #ff2d95,
-      0 0 2rem #ff2d95,
-      0 0 3.75rem #ff2d95;
+      0 0 0.75rem v.$cp-accent-pink,
+      0 0 2rem v.$cp-accent-pink,
+      0 0 3.75rem v.$cp-accent-pink;
   }
   100% {
     text-shadow:
-      0 0 0.5rem #ff2d95,
-      0 0 1.25rem #ff2d95,
-      0 0 2.5rem #ff2d95;
+      0 0 0.5rem v.$cp-accent-pink,
+      0 0 1.25rem v.$cp-accent-pink,
+      0 0 2.5rem v.$cp-accent-pink;
   }
 }
 
@@ -114,25 +116,25 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   padding: 0.25rem 0.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: rgba(224, 212, 245, 0.65);
-  background: rgba(255, 255, 255, 0.02);
+  border: v.$cp-border-thin solid rgba(v.$cp-white, 0.2);
+  color: rgba(v.$cp-text-primary, 0.65);
+  background: rgba(v.$cp-white, 0.02);
 
   &--connected {
-    border-color: rgba(0, 240, 255, 0.5);
+    border-color: rgba(v.$cp-accent-cyan, 0.5);
     color: var(--cp-accent-cyan);
-    background: rgba(0, 240, 255, 0.08);
+    background: rgba(v.$cp-accent-cyan, 0.08);
     animation: cp-badge-blink 2s ease-in-out infinite;
   }
 
   &--connecting {
-    border-color: rgba(255, 230, 0, 0.55);
+    border-color: rgba(v.$cp-accent-yellow, 0.55);
     color: var(--cp-accent-yellow);
     animation: cp-badge-blink 0.8s ease-in-out infinite;
   }
 
   &--error {
-    border-color: rgba(255, 45, 149, 0.55);
+    border-color: rgba(v.$cp-accent-pink, 0.55);
     color: var(--cp-accent-pink);
   }
 }
@@ -147,7 +149,7 @@
   }
 }
 
-@media (max-width: 48.75rem) {
+@media (max-width: v.$cp-breakpoint-md) {
   .cp-metrics {
     grid-template-columns: 1fr;
   }

@@ -1,18 +1,20 @@
+@use '../variables' as v;
+
 .cp-status-bar {
   margin-top: auto;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  background: rgba(10, 0, 21, 0.88);
-  border: 1px solid rgba(176, 0, 255, 0.3);
-  padding: 0.5rem 1rem;
+  gap: v.$cp-space-2;
+  background: rgba(v.$cp-bg-base, 0.88);
+  border: v.$cp-border-thin solid rgba(v.$cp-accent-purple, 0.3);
+  padding: v.$cp-space-2 v.$cp-space-4;
 }
 
 .cp-status-indicator {
-  width: 0.5rem;
-  height: 0.5rem;
+  width: v.$cp-size-dot;
+  height: v.$cp-size-dot;
   border-radius: 50%;
-  background: rgba(176, 0, 255, 0.45);
+  background: rgba(v.$cp-accent-purple, 0.45);
   flex-shrink: 0;
 
   &--active {
@@ -33,11 +35,9 @@
 }
 
 .cp-status-text {
-  margin: 0;
-  font-size: 0.75rem;
-  font-weight: 400;
+  font-size: 0.875rem;
   color: var(--cp-text-secondary);
   letter-spacing: 0.1em;
   line-height: 1.5;
-  text-shadow: 0 0 0.5rem rgba(176, 0, 255, 0.2);
+  text-shadow: 0 0 0.5rem rgba(v.$cp-accent-purple, 0.2);
 }

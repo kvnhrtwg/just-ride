@@ -1,26 +1,8 @@
+@use './variables' as v;
 @import url("https://fonts.googleapis.com/css2?family=Audiowide&family=Share+Tech+Mono&display=swap");
 
-$bg-base: #0a0015;
-$bg-grid: rgba(255, 45, 149, 0.08);
-$bg-glow: rgba(0, 240, 255, 0.22);
-$text-primary: #e0d4f5;
-$text-secondary: #aa98cf;
-$text-muted: #7a6a9a;
-$panel-bg: rgba(10, 0, 21, 0.82);
-$panel-border: rgba(176, 0, 255, 0.35);
-$accent-cyan: #00f0ff;
-$accent-pink: #ff2d95;
-$accent-purple: #b000ff;
-$accent-yellow: #ffe600;
-
-@mixin focus-ring($color) {
-  outline: none;
-  border-color: rgba($color, 0.7);
-  box-shadow: 0 0 0 2px rgba($color, 0.14), 0 0 1.25rem rgba($color, 0.2);
-}
-
 :root {
-  font-family: "Share Tech Mono", monospace;
+  font-family: v.$cp-font-mono;
   line-height: 1.5;
   font-weight: 400;
   color-scheme: dark;
@@ -29,16 +11,16 @@ $accent-yellow: #ffe600;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  --cp-text-primary: #{$text-primary};
-  --cp-text-secondary: #{$text-secondary};
-  --cp-text-muted: #{$text-muted};
-  --cp-bg-base: #{$bg-base};
-  --cp-panel-bg: #{$panel-bg};
-  --cp-panel-border: #{$panel-border};
-  --cp-accent-cyan: #{$accent-cyan};
-  --cp-accent-pink: #{$accent-pink};
-  --cp-accent-purple: #{$accent-purple};
-  --cp-accent-yellow: #{$accent-yellow};
+  --cp-text-primary: #{v.$cp-text-primary};
+  --cp-text-secondary: #{v.$cp-text-secondary};
+  --cp-text-muted: #{v.$cp-text-muted};
+  --cp-bg-base: #{v.$cp-bg-base};
+  --cp-panel-bg: #{v.$cp-panel-bg};
+  --cp-panel-border: #{v.$cp-panel-border};
+  --cp-accent-cyan: #{v.$cp-accent-cyan};
+  --cp-accent-pink: #{v.$cp-accent-pink};
+  --cp-accent-purple: #{v.$cp-accent-purple};
+  --cp-accent-yellow: #{v.$cp-accent-yellow};
 }
 
 *,
@@ -53,16 +35,20 @@ body,
   min-height: 100%;
 }
 
+p {
+  margin: 0;
+}
+
 .app-body {
   margin: 0;
   min-width: 20rem;
-  color: $text-primary;
+  color: v.$cp-text-primary;
   background:
-    linear-gradient($bg-grid 1px, transparent 1px),
-    linear-gradient(90deg, $bg-grid 1px, transparent 1px),
-    radial-gradient(circle at 15% -10%, $bg-glow, transparent 30%),
-    radial-gradient(circle at 85% 5%, rgba($accent-purple, 0.18), transparent 36%),
-    $bg-base;
+    linear-gradient(v.$cp-bg-grid 1px, transparent 1px),
+    linear-gradient(90deg, v.$cp-bg-grid 1px, transparent 1px),
+    radial-gradient(circle at 15% -10%, v.$cp-bg-glow, transparent 30%),
+    radial-gradient(circle at 85% 5%, rgba(v.$cp-accent-purple, 0.18), transparent 36%),
+    v.$cp-bg-base;
   background-size:
     0.25rem 0.25rem,
     0.25rem 0.25rem,
@@ -86,7 +72,7 @@ a {
 .cp-switch,
 .cp-erg-set,
 .cp-settings-trigger {
-  font-family: "Audiowide", cursive;
+  font-family: v.$cp-font-display;
   font-size: 0.75rem;
   font-weight: 400;
   text-transform: uppercase;
@@ -120,12 +106,12 @@ a {
 .cp-page {
   min-height: 100vh;
   margin: 0;
-  font-family: "Share Tech Mono", monospace;
-  color: $text-primary;
-  background-color: $bg-base;
+  font-family: v.$cp-font-mono;
+  color: v.$cp-text-primary;
+  background-color: v.$cp-bg-base;
   background-image:
-    linear-gradient(rgba(255, 45, 149, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 45, 149, 0.08) 1px, transparent 1px);
+    linear-gradient(v.$cp-bg-grid 1px, transparent 1px),
+    linear-gradient(90deg, v.$cp-bg-grid 1px, transparent 1px);
   background-size: 2.5rem 2.5rem;
   position: relative;
   overflow-x: hidden;
@@ -136,9 +122,9 @@ a {
     inset: 0;
     pointer-events: none;
     background:
-      radial-gradient(circle at 25% -10%, rgba(0, 240, 255, 0.22), transparent 40%),
-      radial-gradient(circle at 80% 8%, rgba(176, 0, 255, 0.18), transparent 34%),
-      radial-gradient(circle at 55% 100%, rgba(255, 45, 149, 0.12), transparent 40%);
+      radial-gradient(circle at 25% -10%, rgba(v.$cp-accent-cyan, 0.22), transparent 40%),
+      radial-gradient(circle at 80% 8%, rgba(v.$cp-accent-purple, 0.18), transparent 34%),
+      radial-gradient(circle at 55% 100%, rgba(v.$cp-accent-pink, 0.12), transparent 40%);
   }
 }
 .cp-shell {
@@ -167,39 +153,38 @@ a {
 }
 
 .cp-auth-brand {
-  margin: 0;
-  font-family: "Audiowide", cursive;
+  font-family: v.$cp-font-display;
   font-size: clamp(1rem, 2.25vw, 1.25rem);
   letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: $accent-cyan;
+  color: v.$cp-accent-cyan;
   text-align: center;
   text-shadow:
-    0 0 0.75rem rgba($accent-cyan, 0.45),
-    0 0 1.75rem rgba($accent-pink, 0.24);
+    0 0 0.75rem rgba(v.$cp-accent-cyan, 0.45),
+    0 0 1.75rem rgba(v.$cp-accent-pink, 0.24);
 }
 
 .cp-auth-card {
-  background: $panel-bg;
-  border: 1px solid $panel-border;
+  background: v.$cp-panel-bg;
+  border: v.$cp-border-thin solid v.$cp-panel-border;
   padding: clamp(1rem, 4vw, 1.5rem);
   box-shadow:
-    0 0 0 1px rgba($accent-purple, 0.22) inset,
-    0 0.75rem 2.5rem rgba(0, 0, 0, 0.45),
-    0 0 1.5rem rgba($accent-purple, 0.16);
+    0 0 0 1px rgba(v.$cp-accent-purple, 0.22) inset,
+    0 0.75rem 2.5rem rgba(v.$cp-black, 0.45),
+    0 0 1.5rem rgba(v.$cp-accent-purple, 0.16);
 }
 
 .cp-auth-heading {
   margin: 0 0 0.25rem;
-  font-family: "Audiowide", cursive;
+  font-family: v.$cp-font-display;
   font-size: clamp(1.25rem, 3.25vw, 1.75rem);
-  color: #f4eaff;
+  color: v.$cp-text-heading;
   letter-spacing: 0.08em;
 }
 
 .cp-auth-subtitle {
   margin: 0 0 1.25rem;
-  color: $text-secondary;
+  color: v.$cp-text-secondary;
   font-size: 0.75rem;
   letter-spacing: 0.08em;
 }
@@ -214,7 +199,7 @@ a {
   gap: 0.25rem;
 
   label {
-    color: $text-secondary;
+    color: v.$cp-text-secondary;
     text-transform: uppercase;
     font-size: 0.5rem;
     letter-spacing: 0.18em;
@@ -223,9 +208,9 @@ a {
 
   input {
     width: 100%;
-    border: 1px solid rgba($accent-purple, 0.55);
-    background: rgba(15, 3, 26, 0.9);
-    color: #f2e9ff;
+    border: v.$cp-border-thin solid rgba(v.$cp-accent-purple, 0.55);
+    background: v.$cp-surface-input;
+    color: v.$cp-text-bright-soft;
     font: inherit;
     font-size: 1rem;
     padding: 0.75rem 0.75rem;
@@ -233,17 +218,17 @@ a {
   }
 
   input::placeholder {
-    color: $text-muted;
+    color: v.$cp-text-muted;
   }
 
   input:focus-visible {
-    @include focus-ring($accent-cyan);
+    @include v.cp-focus-ring(v.$cp-accent-cyan);
   }
 }
 
 .cp-auth-error {
   margin: 0;
-  color: #ff6bb4;
+  color: v.$cp-text-pink-alert;
   font-size: 0.75rem;
   letter-spacing: 0.07em;
 }
@@ -251,12 +236,12 @@ a {
 .cp-auth-submit {
   margin-top: 0.25rem;
   width: 100%;
-  border: 1px solid rgba($accent-yellow, 0.62);
-  background: linear-gradient(135deg, rgba(255, 230, 0, 0.11), rgba(255, 45, 149, 0.14));
-  color: $accent-yellow;
+  border: v.$cp-border-thin solid rgba(v.$cp-accent-yellow, 0.62);
+  background: linear-gradient(135deg, rgba(v.$cp-accent-yellow, 0.11), rgba(v.$cp-accent-pink, 0.14));
+  color: v.$cp-accent-yellow;
   text-transform: uppercase;
   letter-spacing: 0.16em;
-  font-family: "Audiowide", cursive;
+  font-family: v.$cp-font-display;
   font-weight: 600;
   font-size: 0.75rem;
   padding: 0.75rem 1rem;
@@ -269,10 +254,10 @@ a {
 }
 
 .cp-auth-submit:hover:not(:disabled) {
-  border-color: rgba($accent-yellow, 0.9);
+  border-color: rgba(v.$cp-accent-yellow, 0.9);
   box-shadow:
-    0 0 0.75rem rgba($accent-yellow, 0.35),
-    0 0 1.5rem rgba($accent-pink, 0.2);
+    0 0 0.75rem rgba(v.$cp-accent-yellow, 0.35),
+    0 0 1.5rem rgba(v.$cp-accent-pink, 0.2);
   transform: translateY(-1px);
 }
 
@@ -284,7 +269,7 @@ a {
 .cp-auth-footer {
   margin-top: 1rem;
   padding-top: 0.75rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: v.$cp-border-thin solid rgba(v.$cp-white, 0.08);
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem 1rem;
@@ -292,7 +277,7 @@ a {
 }
 
 .cp-auth-link {
-  color: $accent-cyan;
+  color: v.$cp-accent-cyan;
   text-transform: uppercase;
   text-decoration: none;
   font-size: 0.75rem;
@@ -301,10 +286,10 @@ a {
 }
 
 .cp-auth-link:hover {
-  color: #76f6ff;
+  color: v.$cp-text-cyan-hover;
   text-shadow:
-    0 0 0.75rem rgba($accent-cyan, 0.45),
-    0 0 1.25rem rgba($accent-pink, 0.25);
+    0 0 0.75rem rgba(v.$cp-accent-cyan, 0.45),
+    0 0 1.25rem rgba(v.$cp-accent-pink, 0.25);
 }
 
 @media (max-width: 33.75rem) {

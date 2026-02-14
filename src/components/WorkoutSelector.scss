@@ -1,132 +1,130 @@
+@use '../variables' as v;
+
 .cp-workout-selector {
   display: grid;
-  gap: 0.75rem;
-  margin-bottom: 0.5rem;
+  gap: v.$cp-space-3;
+  margin-bottom: v.$cp-space-2;
 }
 
 .cp-workout-toggle {
   justify-self: start;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  font-family: 'Audiowide', cursive;
+  font-family: v.$cp-font-display;
   font-size: 0.75rem;
   color: var(--cp-accent-cyan);
-  border: 1px solid rgba(0, 240, 255, 0.52);
-  background: rgba(14, 3, 26, 0.9);
-  padding: 0.5rem 0.75rem;
+  border: v.$cp-border-thin solid rgba(v.$cp-accent-cyan, 0.52);
+  background: v.$cp-surface-input;
+  padding: v.$cp-space-2 v.$cp-space-3;
   cursor: pointer;
-  transition: border-color 180ms ease, box-shadow 180ms ease, color 180ms ease;
+  transition: border-color v.$cp-transition-fast, box-shadow v.$cp-transition-fast, color v.$cp-transition-fast;
 
   &:hover {
-    border-color: rgba(0, 240, 255, 0.82);
-    color: #8ff9ff;
+    border-color: rgba(v.$cp-accent-cyan, 0.82);
+    color: v.$cp-text-cyan-bright;
     box-shadow:
-      0 0 0.75rem rgba(0, 240, 255, 0.26),
-      0 0 1.5rem rgba(176, 0, 255, 0.15);
+      0 0 0.75rem rgba(v.$cp-accent-cyan, 0.26),
+      0 0 1.5rem rgba(v.$cp-accent-purple, 0.15);
   }
 }
 
 .cp-workout-panel {
   display: grid;
-  gap: 0.85rem;
-  background: rgba(10, 0, 21, 0.82);
-  border: 1px solid rgba(176, 0, 255, 0.35);
-  padding: 0.85rem;
+  gap: v.$cp-space-3;
+  background: v.$cp-panel-bg;
+  border: v.$cp-border-thin solid v.$cp-panel-border;
+  padding: v.$cp-space-3;
 }
 
 .cp-workout-levels {
   display: inline-flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: v.$cp-space-2;
 }
 
 .cp-workout-level {
-  border: 1px solid rgba(176, 0, 255, 0.55);
-  background: rgba(12, 1, 24, 0.9);
+  border: v.$cp-border-thin solid rgba(v.$cp-accent-purple, 0.55);
+  background: rgba(v.$cp-bg-base, 0.9);
   color: var(--cp-text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  font-family: 'Audiowide', cursive;
-  font-size: 0.7rem;
-  padding: 0.4rem 0.65rem;
+  font-family: v.$cp-font-display;
+  font-size: 0.75rem;
+  padding: v.$cp-space-2 v.$cp-space-3;
   cursor: pointer;
-  transition: border-color 180ms ease, box-shadow 180ms ease, color 180ms ease;
+  transition: border-color v.$cp-transition-fast, box-shadow v.$cp-transition-fast, color v.$cp-transition-fast;
 }
 
 .cp-workout-level--active {
-  border-color: rgba(255, 230, 0, 0.75);
+  border-color: rgba(v.$cp-accent-yellow, 0.75);
   color: var(--cp-accent-yellow);
-  box-shadow: 0 0 0.65rem rgba(255, 230, 0, 0.2);
+  box-shadow: 0 0 0.75rem rgba(v.$cp-accent-yellow, 0.2);
 }
 
 .cp-workout-list {
   display: grid;
-  gap: 0.75rem;
+  gap: v.$cp-space-4;
 }
 
 .cp-workout-card {
   display: grid;
-  gap: 0.5rem;
-  background: rgba(13, 2, 24, 0.82);
+  gap: v.$cp-space-2;
+  background: rgba(v.$cp-bg-base, 0.82);
 }
 
 .cp-workout-card-header {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 0.75rem;
+  gap: v.$cp-space-3;
 
   h3 {
     margin: 0;
-    font-size: 0.9rem;
+    font-size: 1rem;
     letter-spacing: 0.03em;
-    color: #f4ebff;
+    color: v.$cp-text-bright;
   }
 
   p {
-    margin: 0;
     color: var(--cp-accent-yellow);
-    font-size: 0.75rem;
     letter-spacing: 0.1em;
   }
 }
 
 .cp-workout-description {
-  margin: 0;
   color: var(--cp-text-secondary);
-  font-size: 0.73rem;
-  line-height: 1.4;
+  font-size: 0.875rem;
 }
 
 .cp-workout-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: v.$cp-space-2;
 }
 
 .cp-workout-action {
-  border: 1px solid rgba(255, 255, 255, 0.34);
-  background: rgba(15, 4, 28, 0.9);
-  color: #f3f2ff;
-  font-family: 'Audiowide', cursive;
-  font-size: 0.68rem;
+  border: v.$cp-border-thin solid rgba(v.$cp-white, 0.34);
+  background: v.$cp-surface-input;
+  color: v.$cp-text-bright;
+  font-family: v.$cp-font-display;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  padding: 0.45rem 0.65rem;
+  padding: v.$cp-space-2 v.$cp-space-3;
   cursor: pointer;
 }
 
 .cp-workout-action--detail {
-  border-color: rgba(0, 240, 255, 0.52);
+  border-color: rgba(v.$cp-accent-cyan, 0.52);
   color: var(--cp-accent-cyan);
 }
 
 .cp-workout-detail {
   display: grid;
-  gap: 0.6rem;
-  border: 1px solid rgba(0, 240, 255, 0.26);
-  background: rgba(8, 0, 18, 0.8);
-  padding: 0.7rem;
+  gap: v.$cp-space-2;
+  background: rgba(v.$cp-bg-base, 0.8);
+  margin-top: 1rem;
+  padding: v.$cp-space-1;
 }
 
 .cp-workout-plot {
@@ -140,15 +138,15 @@
 }
 
 .cp-workout-ref-line {
-  stroke: rgba(255, 255, 255, 0.25);
-  stroke-width: 0.3;
+  stroke: rgba(v.$cp-white, 0.25);
+  stroke-width: 0.2;
 }
 
 .cp-workout-ref-label {
   position: absolute;
-  right: 0.35rem;
-  transform: translateY(-50%);
-  font-size: 0.6rem;
+  left: 0;
+  transform: translateY(-85%);
+  font-size: 0.75rem;
   letter-spacing: 0.06em;
   color: var(--cp-text-muted);
   pointer-events: none;
@@ -165,20 +163,20 @@
 .cp-workout-segment-readout {
   margin: 0;
   display: grid;
-  gap: 0.2rem;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(6, 0, 14, 0.7);
-  padding: 0.45rem 0.55rem;
+  gap: v.$cp-space-1;
+  border: v.$cp-border-thin solid rgba(v.$cp-white, 0.12);
+  background: rgba(v.$cp-bg-base, 0.7);
+  padding: v.$cp-space-2 v.$cp-space-2;
 }
 
 .cp-workout-segment-title,
 .cp-workout-segment-power {
   margin: 0;
-  font-size: 0.74rem;
+  font-size: 0.75rem;
 }
 
 .cp-workout-segment-title {
-  color: #f4ebff;
+  color: v.$cp-text-bright;
 }
 
 .cp-workout-segment-power {
@@ -188,10 +186,10 @@
 .cp-workout-empty {
   margin: 0;
   color: var(--cp-text-muted);
-  font-size: 0.72rem;
+  font-size: 0.75rem;
 }
 
-@media (max-width: 48.75rem) {
+@media (max-width: v.$cp-breakpoint-md) {
   .cp-workout-toggle {
     width: 100%;
   }
@@ -199,6 +197,6 @@
   .cp-workout-card-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.35rem;
+    gap: 0.25rem;
   }
 }

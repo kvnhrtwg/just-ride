@@ -60,6 +60,7 @@ Server-side `getToken()` in `__root.tsx` `beforeLoad` → token injected into `c
 
 - **CSS classes**: All prefixed with `cp-` (e.g., `cp-card`, `cp-panel`). BEM modifiers with double-dash (`cp-badge--connected`).
 - **SCSS variables**: Defined in `src/styles.scss`, exposed as CSS custom properties (`--cp-*`).
+- **SCSS units**: Use `rem` for sizing and spacing in `0.125rem` steps. Only `1px` and `2px` are allowed where thin pixel borders are needed.
 - **Formatting**: No semicolons, single quotes, trailing commas (Prettier).
 - **Path alias**: `@/*` maps to `src/*`.
 - **Props**: Typed with `type` declarations (not `interface`).

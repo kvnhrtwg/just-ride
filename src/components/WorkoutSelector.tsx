@@ -124,9 +124,7 @@ function WorkoutDetailTimeline({
     [workout.id, workout.segments],
   )
 
-  const ftpLineY = getSegmentTopY(1.0, maxFtp)
   const maxLineY = getSegmentTopY(maxFtp, maxFtp)
-  const showMaxLine = maxFtp > 1.05
   const maxWatts = Math.round(maxFtp * ftp)
 
   if (workout.segments.length === 0) {
@@ -161,20 +159,11 @@ function WorkoutDetailTimeline({
 
           <line
             x1={0}
-            y1={ftpLineY}
+            y1={maxLineY}
             x2={WORKOUT_PLOT_WIDTH}
-            y2={ftpLineY}
+            y2={maxLineY}
             className="cp-workout-ref-line"
           />
-          {showMaxLine && (
-            <line
-              x1={0}
-              y1={maxLineY}
-              x2={WORKOUT_PLOT_WIDTH}
-              y2={maxLineY}
-              className="cp-workout-ref-line"
-            />
-          )}
 
           {segmentGeometries.map((geometry) => {
             const isActive = activeSegment?.id === geometry.segment.id
@@ -196,11 +185,7 @@ function WorkoutDetailTimeline({
                   width={geometry.width}
                   height={WORKOUT_PLOT_HEIGHT}
                   fill="transparent"
-                  tabIndex={0}
-                  role="button"
-                  aria-label={`${geometry.segment.label}, ${formatSegmentPower(geometry.segment, ftp)}`}
                   onMouseEnter={() => setHoveredSegmentId(geometry.segment.id)}
-                  onFocus={() => setHoveredSegmentId(geometry.segment.id)}
                 />
               </g>
             )
@@ -208,18 +193,10 @@ function WorkoutDetailTimeline({
         </svg>
         <span
           className="cp-workout-ref-label"
-          style={{ top: `${(ftpLineY / WORKOUT_PLOT_HEIGHT) * 100}%` }}
+          style={{ top: `${(maxLineY / WORKOUT_PLOT_HEIGHT) * 100}%` }}
         >
-          FTP {ftp} W
+          {maxWatts} W
         </span>
-        {showMaxLine && (
-          <span
-            className="cp-workout-ref-label"
-            style={{ top: `${(maxLineY / WORKOUT_PLOT_HEIGHT) * 100}%` }}
-          >
-            {maxWatts} W
-          </span>
-        )}
       </div>
 
       {activeSegment ? (

@@ -1,18 +1,20 @@
+@use '../variables' as v;
+
 .cp-connections {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-  margin-bottom: 1.25rem;
+  gap: v.$cp-space-4;
+  margin-bottom: v.$cp-space-4;
 }
 
 .cp-panel {
   position: relative;
-  padding: 1rem;
+  padding: v.$cp-space-4;
 }
 
 .cp-panel-label {
   display: block;
-  margin-bottom: 0.75rem;
+  margin-bottom: v.$cp-space-3;
   color: var(--cp-text-secondary);
   letter-spacing: 0.16em;
 }
@@ -23,9 +25,9 @@
   width: 100%;
   overflow: hidden;
   letter-spacing: 0.1em;
-  padding: 0.5rem 1rem;
-  border: 2px solid;
-  transition: all 0.2s ease;
+  padding: v.$cp-space-2 v.$cp-space-4;
+  border: v.$cp-border-thick solid;
+  transition: v.$cp-transition-panel;
 
   &:disabled {
     opacity: 0.35;
@@ -35,21 +37,21 @@
 
 .cp-switch--on,
 .cp-switch--off {
-  background: rgba(255, 255, 255, 0.06);
-  color: #f3f2ff;
-  border-color: rgba(255, 255, 255, 0.52);
+  background: v.$cp-surface-action;
+  color: v.$cp-text-bright;
+  border-color: rgba(v.$cp-white, 0.52);
 
   &:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.75);
+    background: v.$cp-surface-action-hover;
+    border-color: rgba(v.$cp-white, 0.75);
     box-shadow:
-      0 0 0.75rem rgba(255, 255, 255, 0.32),
-      0 0 2rem rgba(255, 255, 255, 0.14),
-      inset 0 0 0.75rem rgba(255, 255, 255, 0.08);
+      0 0 0.75rem rgba(v.$cp-white, 0.32),
+      0 0 2rem rgba(v.$cp-white, 0.14),
+      inset 0 0 0.75rem rgba(v.$cp-white, 0.08);
   }
 }
 
-@media (max-width: 48.75rem) {
+@media (max-width: v.$cp-breakpoint-md) {
   .cp-connections {
     grid-template-columns: 1fr;
   }
