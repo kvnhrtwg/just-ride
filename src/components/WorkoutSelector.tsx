@@ -11,6 +11,7 @@ import './WorkoutSelector.scss'
 type WorkoutSelectorProps = {
   ftp: number
   ergControlAvailable: boolean
+  canStartWithoutTrainer: boolean
   onStartWorkout: (workout: WorkoutDefinition) => void
 }
 
@@ -19,6 +20,7 @@ const INTENSITY_OPTIONS: WorkoutIntensity[] = ['lit', 'mit', 'hit']
 export function WorkoutSelector({
   ftp,
   ergControlAvailable,
+  canStartWithoutTrainer,
   onStartWorkout,
 }: WorkoutSelectorProps) {
   const [isOpen, setIsOpen] = useState(false)
@@ -51,7 +53,9 @@ export function WorkoutSelector({
         <div id="cp-workout-chooser" className="cp-workout-panel">
           {!ergControlAvailable ? (
             <p className="cp-workout-helper">
-              Connect a trainer with FTMS control before starting a workout.
+              {canStartWithoutTrainer
+                ? 'No trainer connected. Starting now uses simulated power, cadence, and heart rate.'
+                : 'Connect a trainer with FTMS control before starting a workout.'}
             </p>
           ) : null}
           <div className="cp-workout-levels" role="tablist" aria-label="Workout intensity">
@@ -89,7 +93,10 @@ export function WorkoutSelector({
                     <button
                       type="button"
                       className="cp-workout-action cp-workout-action--start"
-                      disabled={!ergControlAvailable || workout.segments.length === 0}
+                      disabled={
+                        workout.segments.length === 0 ||
+                        (!ergControlAvailable && !canStartWithoutTrainer)
+                      }
                       onClick={() => onStartWorkout(workout)}
                     >
                       Start Workout

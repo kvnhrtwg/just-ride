@@ -5,20 +5,20 @@ import { useAction, useMutation as useConvexMutation } from 'convex/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { api } from '../../convex/_generated/api'
 import type { Id } from '../../convex/_generated/dataModel'
+import type { WorkoutExecutionSample } from '@/hooks/useWorkoutExecution'
+import type { WorkoutDefinition } from '@/workouts/catalog'
 import { Header } from '@/components/Header'
 import { MetricCards } from '@/components/MetricCards'
+import { useWorkoutDataSource } from '@/hooks/useWorkoutDataSource'
 import { useTrainerBluetooth } from '@/hooks/useTrainerBluetooth'
 import { WorkoutSelector } from '@/components/WorkoutSelector'
 import { WorkoutProgress } from '@/components/WorkoutProgress'
-import {
-  useWorkoutExecution,
-  type WorkoutExecutionSample,
-} from '@/hooks/useWorkoutExecution'
-import type { WorkoutDefinition } from '@/workouts/catalog'
+import { useWorkoutExecution } from '@/hooks/useWorkoutExecution'
 
 const currentUserQuery = convexQuery(api.auth.getCurrentUser, {})
 const userDataQuery = convexQuery(api.userData.getCurrentUserData, {})
 const workoutSampleChunkSize = 60
+const FAKE_WORKOUT_ALLOWED_EMAIL = 'kvnhrtwg@gmail.com'
 
 type RecorderSample = {
   timestampMs: number
@@ -71,6 +71,7 @@ function Home() {
   const [isFinalizingWorkout, setIsFinalizingWorkout] = useState(false)
   const [isPreparingFitDownload, setIsPreparingFitDownload] = useState(false)
   const [isDiscardingWorkout, setIsDiscardingWorkout] = useState(false)
+  const [isWorkoutLifecycleActive, setIsWorkoutLifecycleActive] = useState(false)
   const [fitDownloadErrorMessage, setFitDownloadErrorMessage] = useState<string | null>(null)
   const [recordingErrorMessage, setRecordingErrorMessage] = useState<string | null>(null)
   const { data: currentUser } = useSuspenseQuery(currentUserQuery) as {
@@ -79,6 +80,9 @@ function Home() {
   const { data: userData } = useSuspenseQuery(userDataQuery) as {
     data: UserDataResult
   }
+  const canUseFakeTelemetry =
+    typeof currentUser?.email === 'string' &&
+    currentUser.email.trim().toLowerCase() === FAKE_WORKOUT_ALLOWED_EMAIL
   const model = useTrainerBluetooth({ initialErgTargetWatts: userData.ftp })
   const recorderRef = useRef<RecorderState>({
     sessionId: null,
@@ -97,16 +101,31 @@ function Home() {
     connectionState,
     heartRateConnectionState,
     ergControlAvailable,
-    livePowerWatts,
-    cadenceRpm,
-    heartRateBpm,
+    livePowerWatts: trainerLivePowerWatts,
+    cadenceRpm: trainerCadenceRpm,
+    heartRateBpm: trainerHeartRateBpm,
     setErgTargetWatts,
-    setErgTargetValue,
+    setErgTargetValue: setTrainerErgTargetValue,
     connectTrainer,
     disconnectTrainer,
     connectHeartRateMonitor,
     disconnectHeartRateMonitor,
   } = model
+  const {
+    isUsingFakeTelemetry,
+    livePowerWatts,
+    cadenceRpm,
+    heartRateBpm,
+    setErgTargetValue,
+  } = useWorkoutDataSource({
+    connectionState,
+    livePowerWatts: trainerLivePowerWatts,
+    cadenceRpm: trainerCadenceRpm,
+    heartRateBpm: trainerHeartRateBpm,
+    setTrainerErgTargetValue,
+    isWorkoutPendingOrActive: isWorkoutLifecycleActive,
+    canUseFakeTelemetry,
+  })
 
   const flushBufferedSamples = useCallback(
     async (forceFlush: boolean) => {
@@ -195,7 +214,8 @@ function Home() {
     start: startWorkout,
     stop: stopWorkout,
   } = workoutExecution
-  const waitingForFirstPower = pendingWorkoutStart !== null && !activeWorkout
+  const waitingForFirstPower =
+    pendingWorkoutStart !== null && !activeWorkout && !isUsingFakeTelemetry
   const displayedWorkout = activeWorkout ?? pendingWorkoutStart
 
   const finalizeCurrentWorkoutSession = useCallback(
@@ -247,7 +267,7 @@ function Home() {
     if (activeWorkout) {
       return
     }
-    if (typeof livePowerWatts !== 'number' || livePowerWatts <= 0) {
+    if (!isUsingFakeTelemetry && (typeof livePowerWatts !== 'number' || livePowerWatts <= 0)) {
       return
     }
 
@@ -298,6 +318,7 @@ function Home() {
     activeWorkout,
     finalizeCurrentWorkoutSession,
     livePowerWatts,
+    isUsingFakeTelemetry,
     pendingWorkoutStart,
     queueChunkFlush,
     startWorkout,
@@ -318,15 +339,17 @@ function Home() {
   }
 
   const handleStartWorkout = (workout: WorkoutDefinition) => {
-    if (!ergControlAvailable) {
+    if (!ergControlAvailable && !canUseFakeTelemetry) {
       return
     }
+    setIsWorkoutLifecycleActive(true)
     setPendingWorkoutStart(workout)
   }
 
   const handleEndWorkout = () => {
     if (waitingForFirstPower) {
       setPendingWorkoutStart(null)
+      setIsWorkoutLifecycleActive(false)
       return
     }
     if (!activeWorkout || workoutCompleted) {
@@ -338,6 +361,7 @@ function Home() {
 
   const handleDoneWorkout = () => {
     stopWorkout()
+    setIsWorkoutLifecycleActive(false)
     setPendingWorkoutStart(null)
     setActiveSessionId(null)
     setCompletedSessionId(null)
@@ -461,6 +485,7 @@ function Home() {
           <WorkoutSelector
             ftp={userData.ftp}
             ergControlAvailable={ergControlAvailable}
+            canStartWithoutTrainer={canUseFakeTelemetry}
             onStartWorkout={handleStartWorkout}
           />
         )}
