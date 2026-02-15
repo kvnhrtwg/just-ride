@@ -1,6 +1,6 @@
 import { convexQuery } from '@convex-dev/react-query'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import {
   Chart as ChartJS,
   Legend,
@@ -11,11 +11,12 @@ import {
   type ChartData,
   type ChartOptions,
 } from 'chart.js'
-import { useAction } from 'convex/react'
+import { useAction, useMutation as useConvexMutation } from 'convex/react'
 import type { Id } from '../../convex/_generated/dataModel'
 import { api } from '../../convex/_generated/api'
-import { useMemo, useState } from 'react'
+import { useId, useMemo, useRef, useState } from 'react'
 import { Line } from 'react-chartjs-2'
+import { Popover } from '@/components/Popover'
 import { downloadFitFile } from '@/lib/fit-download'
 import './workouts.$sessionId.scss'
 
@@ -93,11 +94,21 @@ export const Route = createFileRoute('/workouts/$sessionId')({
 function WorkoutDetailPage() {
   const { sessionId } = Route.useParams()
   const normalizedSessionId = sessionId as Id<'workoutSessions'>
+  const navigate = useNavigate()
+  const discardWorkoutSession = useConvexMutation(
+    api.workouts.discardWorkoutSession,
+  )
   const generateWorkoutFitDownload = useAction(
     api.workoutExports.generateWorkoutFitDownload,
   )
+  const deleteWorkoutPopoverId = useId()
+  const deleteWorkoutPopoverRef = useRef<HTMLDivElement | null>(null)
   const [isPreparingFitDownload, setIsPreparingFitDownload] = useState(false)
+  const [isDeletingWorkout, setIsDeletingWorkout] = useState(false)
   const [fitDownloadErrorMessage, setFitDownloadErrorMessage] = useState<
+    string | null
+  >(null)
+  const [deleteWorkoutErrorMessage, setDeleteWorkoutErrorMessage] = useState<
     string | null
   >(null)
   const { data: workoutDetail } = useSuspenseQuery(
@@ -162,6 +173,30 @@ function WorkoutDetailPage() {
     }
   }
 
+  const handleDeleteWorkout = async (): Promise<boolean> => {
+    if (isDeletingWorkout) {
+      return false
+    }
+
+    setDeleteWorkoutErrorMessage(null)
+    setFitDownloadErrorMessage(null)
+    setIsDeletingWorkout(true)
+    try {
+      await discardWorkoutSession({
+        sessionId: normalizedSessionId,
+      })
+      void navigate({ to: '/' })
+      return true
+    } catch (error) {
+      setDeleteWorkoutErrorMessage(
+        `Unable to delete workout: ${getErrorMessage(error)}`,
+      )
+      return false
+    } finally {
+      setIsDeletingWorkout(false)
+    }
+  }
+
   return (
     <main className="cp-page">
       <div className="cp-shell">
@@ -183,12 +218,55 @@ function WorkoutDetailPage() {
                 type="button"
                 className="cp-btn cp-workout-detail-action"
                 onClick={handleDownloadFit}
-                disabled={isPreparingFitDownload}
+                disabled={isPreparingFitDownload || isDeletingWorkout}
               >
                 {isPreparingFitDownload ? 'Preparing FIT' : 'Download FIT'}
               </button>
+              <button
+                type="button"
+                className="cp-btn cp-btn-danger cp-workout-detail-action"
+                popoverTarget={deleteWorkoutPopoverId}
+                popoverTargetAction="toggle"
+                disabled={isPreparingFitDownload || isDeletingWorkout}
+              >
+                {isDeletingWorkout ? 'Deleting' : 'Delete workout'}
+              </button>
             </div>
           </header>
+          <Popover
+            id={deleteWorkoutPopoverId}
+            ref={deleteWorkoutPopoverRef}
+            title="Delete workout?"
+            closeLabel="Close delete workout confirmation"
+            className="cp-workout-detail-delete-popover"
+            titleTag="h3"
+          >
+            <p>This permanently removes this workout and all recorded samples.</p>
+            <div className="cp-workout-detail-delete-actions">
+              <button
+                type="button"
+                className="cp-btn cp-workout-detail-action"
+                popoverTarget={deleteWorkoutPopoverId}
+                popoverTargetAction="hide"
+                disabled={isDeletingWorkout}
+              >
+                Keep Workout
+              </button>
+              <button
+                type="button"
+                className="cp-btn cp-btn-danger cp-workout-detail-action"
+                onClick={async () => {
+                  const didDelete = await handleDeleteWorkout()
+                  if (didDelete) {
+                    deleteWorkoutPopoverRef.current?.hidePopover()
+                  }
+                }}
+                disabled={isDeletingWorkout}
+              >
+                {isDeletingWorkout ? 'Deleting' : 'Delete'}
+              </button>
+            </div>
+          </Popover>
 
           <section className="cp-workout-detail-summary" aria-label="Workout averages">
             <SummaryMetric
@@ -221,6 +299,11 @@ function WorkoutDetailPage() {
 
           {fitDownloadErrorMessage ? (
             <p className="cp-workout-detail-download-error">{fitDownloadErrorMessage}</p>
+          ) : null}
+          {deleteWorkoutErrorMessage ? (
+            <p className="cp-workout-detail-delete-error">
+              {deleteWorkoutErrorMessage}
+            </p>
           ) : null}
         </section>
       </div>

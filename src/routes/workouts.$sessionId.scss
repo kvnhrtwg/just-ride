@@ -125,6 +125,27 @@
   font-size: 0.8125rem;
 }
 
+.cp-workout-detail-delete-error {
+  margin: 0;
+  color: var(--cp-accent-pink);
+  font-size: 0.8125rem;
+}
+
+.cp-workout-detail-delete-popover {
+  p {
+    margin: 0;
+    color: var(--cp-text-secondary);
+    font-size: 0.8125rem;
+  }
+}
+
+.cp-workout-detail-delete-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: v.$cp-space-2;
+}
+
 @media (max-width: v.$cp-breakpoint-md) {
   .cp-workout-detail-summary {
     grid-template-columns: 1fr;
