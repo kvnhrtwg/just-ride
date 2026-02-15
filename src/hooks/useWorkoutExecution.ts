@@ -8,7 +8,6 @@ export type WorkoutExecutionSample = {
   elapsedSeconds: number
   segmentId: string | null
   segmentIndex: number
-  targetWatts: number | null
   livePowerWatts: number | null
   cadenceRpm: number | null
   heartRateBpm: number | null
@@ -253,7 +252,6 @@ export function useWorkoutExecution({
       elapsedSeconds,
       segmentId: activeSegment?.id ?? null,
       segmentIndex: activeSegmentIndex,
-      targetWatts: currentTargetWatts,
       livePowerWatts,
       cadenceRpm,
       heartRateBpm,
