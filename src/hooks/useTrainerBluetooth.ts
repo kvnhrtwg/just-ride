@@ -215,12 +215,12 @@ function parseHeartRateMeasurement(value: DataView): number | null {
   return value.getUint8(1)
 }
 
-function encodeSetTargetPower(watts: number): Uint8Array {
+function encodeSetTargetPower(targetWatts: number): Uint8Array {
   const payload = new Uint8Array(3)
   const view = new DataView(payload.buffer)
 
   payload[0] = SET_TARGET_POWER_OPCODE
-  view.setInt16(1, watts, true)
+  view.setInt16(1, targetWatts, true)
   return payload
 }
 

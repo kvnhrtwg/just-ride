@@ -9,7 +9,7 @@ type FakeWorkoutTelemetryListener = (snapshot: FakeWorkoutTelemetrySnapshot) => 
 type FakeWorkoutTelemetryService = {
   start: () => void
   stop: () => void
-  setErgSetpointWatts: (watts: number | null) => void
+  setTargetWatts: (targetWatts: number | null) => void
   getSnapshot: () => FakeWorkoutTelemetrySnapshot
   subscribe: (listener: FakeWorkoutTelemetryListener) => () => void
 }
@@ -21,7 +21,7 @@ type CreateFakeWorkoutTelemetryServiceOptions = {
 const DEFAULT_TICK_INTERVAL_MS = 1000
 const CADENCE_RANGE = { min: 70, max: 90 }
 const HEART_RATE_RANGE = { min: 100, max: 140 }
-const MAX_ERG_SETPOINT_WATTS = 2000
+const MAX_TARGET_WATTS = 2000
 
 export function createFakeWorkoutTelemetryService(
   options: CreateFakeWorkoutTelemetryServiceOptions = {}
@@ -30,7 +30,7 @@ export function createFakeWorkoutTelemetryService(
   const listeners = new Set<FakeWorkoutTelemetryListener>()
 
   let timer: ReturnType<typeof setInterval> | null = null
-  let ergSetpointWatts: number | null = null
+  let targetWatts: number | null = null
   let snapshot: FakeWorkoutTelemetrySnapshot = {
     powerWatts: null,
     cadenceRpm: null,
@@ -44,9 +44,8 @@ export function createFakeWorkoutTelemetryService(
   }
 
   const tick = () => {
-    const nextPowerWatts = ergSetpointWatts
-    const targetRatio =
-      ergSetpointWatts === null ? 0.45 : clamp(ergSetpointWatts / 320, 0, 1)
+    const nextPowerWatts = targetWatts
+    const targetRatio = targetWatts === null ? 0.45 : clamp(targetWatts / 320, 0, 1)
     const desiredCadence = 74 + targetRatio * 12
     const desiredHeartRate = 104 + targetRatio * 32
 
@@ -85,7 +84,7 @@ export function createFakeWorkoutTelemetryService(
       }
       if (snapshot.cadenceRpm === null || snapshot.heartRateBpm === null) {
         snapshot = {
-          powerWatts: ergSetpointWatts,
+          powerWatts: targetWatts,
           cadenceRpm: Math.round(randomBetween(75, 82)),
           heartRateBpm: Math.round(randomBetween(108, 118)),
         }
@@ -105,15 +104,15 @@ export function createFakeWorkoutTelemetryService(
       }
       emit()
     },
-    setErgSetpointWatts: (nextSetpointWatts: number | null) => {
-      ergSetpointWatts =
-        typeof nextSetpointWatts === 'number' && Number.isFinite(nextSetpointWatts)
-          ? clamp(Math.round(nextSetpointWatts), 0, MAX_ERG_SETPOINT_WATTS)
+    setTargetWatts: (nextTargetWatts: number | null) => {
+      targetWatts =
+        typeof nextTargetWatts === 'number' && Number.isFinite(nextTargetWatts)
+          ? clamp(Math.round(nextTargetWatts), 0, MAX_TARGET_WATTS)
           : null
-      if (snapshot.powerWatts !== ergSetpointWatts) {
+      if (snapshot.powerWatts !== targetWatts) {
         snapshot = {
           ...snapshot,
-          powerWatts: ergSetpointWatts,
+          powerWatts: targetWatts,
         }
         emit()
       }

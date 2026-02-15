@@ -54,13 +54,13 @@ export function useWorkoutDataSource({
     }
 
     fakeServiceRef.current.stop()
-    fakeServiceRef.current.setErgSetpointWatts(null)
+    fakeServiceRef.current.setTargetWatts(null)
   }, [isUsingFakeTelemetry])
 
   const setErgTargetValue = useCallback(
     async (value: number, options?: { announce?: boolean }) => {
       if (isUsingFakeTelemetry) {
-        fakeServiceRef.current.setErgSetpointWatts(value)
+        fakeServiceRef.current.setTargetWatts(value)
         return true
       }
       return setTrainerErgTargetValue(value, options)
