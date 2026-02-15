@@ -294,6 +294,12 @@ function WorkoutMetricChart({
                 return ''
               }
               const elapsedSeconds = first.parsed.x
+              if (
+                typeof elapsedSeconds !== 'number' ||
+                !Number.isFinite(elapsedSeconds)
+              ) {
+                return ''
+              }
               return formatDuration(elapsedSeconds)
             },
             label(context) {
