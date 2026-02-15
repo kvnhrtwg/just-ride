@@ -19,8 +19,10 @@ type WorkoutProgressProps = {
   onEndWorkout: () => void
   onDiscardWorkout: () => Promise<void>
   onDownloadFit: () => void
+  onViewWorkoutDetails: () => void
   onDone: () => void
   canDownloadFit: boolean
+  canViewWorkoutDetails: boolean
   isPreparingFitDownload: boolean
   isFinalizingWorkout: boolean
   isDiscardingWorkout: boolean
@@ -41,8 +43,10 @@ export function WorkoutProgress({
   onEndWorkout,
   onDiscardWorkout,
   onDownloadFit,
+  onViewWorkoutDetails,
   onDone,
   canDownloadFit,
+  canViewWorkoutDetails,
   isPreparingFitDownload,
   isFinalizingWorkout,
   isDiscardingWorkout,
@@ -88,6 +92,16 @@ export function WorkoutProgress({
       <div className="cp-workout-progress-actions">
         {isCompleted ? (
           <>
+            <button
+              type="button"
+              className="cp-btn cp-workout-progress-action"
+              onClick={onViewWorkoutDetails}
+              disabled={
+                !canViewWorkoutDetails || isDiscardingWorkout || isFinalizingWorkout
+              }
+            >
+              View details
+            </button>
             <button
               type="button"
               className="cp-btn cp-workout-progress-action"

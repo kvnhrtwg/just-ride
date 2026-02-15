@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { convexQuery } from '@convex-dev/react-query'
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { useAction, useMutation as useConvexMutation } from 'convex/react'
@@ -16,6 +16,7 @@ import { WorkoutProgress } from '@/components/WorkoutProgress'
 import { WorkoutBlockSidebar } from '@/components/WorkoutBlockSidebar'
 import { WorkoutTelemetryChart } from '@/components/WorkoutTelemetryChart'
 import { useWorkoutExecution } from '@/hooks/useWorkoutExecution'
+import { downloadFitFile } from '@/lib/fit-download'
 import './index.scss'
 
 const currentUserQuery = convexQuery(api.auth.getCurrentUser, {})
@@ -64,6 +65,7 @@ export const Route = createFileRoute('/')({
 
 function Home() {
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
   const setCurrentUserFtp = useConvexMutation(api.userData.setCurrentUserFtp)
   const startWorkoutSession = useConvexMutation(
     api.workouts.startWorkoutSession,
@@ -529,16 +531,7 @@ function Home() {
     setIsPreparingFitDownload(true)
     try {
       const result = await generateWorkoutFitDownload({ sessionId })
-      const fitBytes = decodeBase64ToArrayBuffer(result.contentBase64)
-      const blob = new Blob([fitBytes], { type: 'application/octet-stream' })
-      const downloadUrl = window.URL.createObjectURL(blob)
-      const anchor = document.createElement('a')
-      anchor.href = downloadUrl
-      anchor.download = result.fileName
-      document.body.append(anchor)
-      anchor.click()
-      anchor.remove()
-      window.URL.revokeObjectURL(downloadUrl)
+      downloadFitFile(result)
     } catch (error) {
       setFitDownloadErrorMessage(
         `Unable to generate FIT download: ${getErrorMessage(error)}`,
@@ -547,6 +540,21 @@ function Home() {
       setIsPreparingFitDownload(false)
     }
   }
+
+  const handleViewWorkoutDetails = useCallback(() => {
+    const sessionId =
+      completedSessionId ?? activeSessionId ?? recorderRef.current.sessionId
+    if (!sessionId) {
+      return
+    }
+
+    void navigate({
+      to: '/workouts/$sessionId',
+      params: {
+        sessionId,
+      },
+    })
+  }, [activeSessionId, completedSessionId, navigate])
 
   return (
     <main className="cp-page">
@@ -618,8 +626,12 @@ function Home() {
                   onEndWorkout={handleEndWorkout}
                   onDiscardWorkout={handleDiscardWorkout}
                   onDownloadFit={handleDownloadFit}
+                  onViewWorkoutDetails={handleViewWorkoutDetails}
                   onDone={handleDoneWorkout}
                   canDownloadFit={Boolean(
+                    completedSessionId ?? activeSessionId,
+                  )}
+                  canViewWorkoutDetails={Boolean(
                     completedSessionId ?? activeSessionId,
                   )}
                   isPreparingFitDownload={isPreparingFitDownload}
@@ -643,15 +655,6 @@ function Home() {
       </div>
     </main>
   )
-}
-
-function decodeBase64ToArrayBuffer(encoded: string): ArrayBuffer {
-  const decoded = window.atob(encoded)
-  const bytes = new Uint8Array(decoded.length)
-  for (let index = 0; index < decoded.length; index += 1) {
-    bytes[index] = decoded.charCodeAt(index)
-  }
-  return bytes.buffer
 }
 
 function getErrorMessage(error: unknown): string {
