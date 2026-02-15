@@ -556,6 +556,10 @@ function Home() {
     })
   }, [activeSessionId, completedSessionId, navigate])
 
+  const handleViewPastWorkouts = useCallback(() => {
+    void navigate({ to: '/workouts' })
+  }, [navigate])
+
   return (
     <main className="cp-page">
       <div className="cp-shell">
@@ -650,6 +654,7 @@ function Home() {
             ergControlAvailable={ergControlAvailable}
             canStartWithoutTrainer={canUseFakeTelemetry}
             onStartWorkout={handleStartWorkout}
+            onViewPastWorkouts={handleViewPastWorkouts}
           />
         )}
       </div>

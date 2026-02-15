@@ -9,12 +9,19 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WorkoutsRouteImport } from './routes/workouts'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as WorkoutsIndexRouteImport } from './routes/workouts.index'
 import { Route as WorkoutsSessionIdRouteImport } from './routes/workouts.$sessionId'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
+const WorkoutsRoute = WorkoutsRouteImport.update({
+  id: '/workouts',
+  path: '/workouts',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
@@ -30,10 +37,15 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WorkoutsIndexRoute = WorkoutsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => WorkoutsRoute,
+} as any)
 const WorkoutsSessionIdRoute = WorkoutsSessionIdRouteImport.update({
-  id: '/workouts/$sessionId',
-  path: '/workouts/$sessionId',
-  getParentRoute: () => rootRouteImport,
+  id: '/$sessionId',
+  path: '/$sessionId',
+  getParentRoute: () => WorkoutsRoute,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
@@ -45,7 +57,9 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/workouts': typeof WorkoutsRouteWithChildren
   '/workouts/$sessionId': typeof WorkoutsSessionIdRoute
+  '/workouts/': typeof WorkoutsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
@@ -53,6 +67,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/workouts/$sessionId': typeof WorkoutsSessionIdRoute
+  '/workouts': typeof WorkoutsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
@@ -60,20 +75,37 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/workouts': typeof WorkoutsRouteWithChildren
   '/workouts/$sessionId': typeof WorkoutsSessionIdRoute
+  '/workouts/': typeof WorkoutsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/signup' | '/workouts/$sessionId' | '/api/auth/$'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/signup'
+    | '/workouts'
+    | '/workouts/$sessionId'
+    | '/workouts/'
+    | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/signup' | '/workouts/$sessionId' | '/api/auth/$'
+  to:
+    | '/'
+    | '/login'
+    | '/signup'
+    | '/workouts/$sessionId'
+    | '/workouts'
+    | '/api/auth/$'
   id:
     | '__root__'
     | '/'
     | '/login'
     | '/signup'
+    | '/workouts'
     | '/workouts/$sessionId'
+    | '/workouts/'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
@@ -81,12 +113,19 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LoginRoute: typeof LoginRoute
   SignupRoute: typeof SignupRoute
-  WorkoutsSessionIdRoute: typeof WorkoutsSessionIdRoute
+  WorkoutsRoute: typeof WorkoutsRouteWithChildren
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/workouts': {
+      id: '/workouts'
+      path: '/workouts'
+      fullPath: '/workouts'
+      preLoaderRoute: typeof WorkoutsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/signup': {
       id: '/signup'
       path: '/signup'
@@ -108,12 +147,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/workouts/': {
+      id: '/workouts/'
+      path: '/'
+      fullPath: '/workouts/'
+      preLoaderRoute: typeof WorkoutsIndexRouteImport
+      parentRoute: typeof WorkoutsRoute
+    }
     '/workouts/$sessionId': {
       id: '/workouts/$sessionId'
-      path: '/workouts/$sessionId'
+      path: '/$sessionId'
       fullPath: '/workouts/$sessionId'
       preLoaderRoute: typeof WorkoutsSessionIdRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof WorkoutsRoute
     }
     '/api/auth/$': {
       id: '/api/auth/$'
@@ -125,11 +171,25 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface WorkoutsRouteChildren {
+  WorkoutsSessionIdRoute: typeof WorkoutsSessionIdRoute
+  WorkoutsIndexRoute: typeof WorkoutsIndexRoute
+}
+
+const WorkoutsRouteChildren: WorkoutsRouteChildren = {
+  WorkoutsSessionIdRoute: WorkoutsSessionIdRoute,
+  WorkoutsIndexRoute: WorkoutsIndexRoute,
+}
+
+const WorkoutsRouteWithChildren = WorkoutsRoute._addFileChildren(
+  WorkoutsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
   SignupRoute: SignupRoute,
-  WorkoutsSessionIdRoute: WorkoutsSessionIdRoute,
+  WorkoutsRoute: WorkoutsRouteWithChildren,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport

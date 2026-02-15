@@ -6,8 +6,13 @@
   margin-bottom: v.$cp-space-2;
 }
 
+.cp-workout-selector-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: v.$cp-space-2;
+}
+
 .cp-workout-toggle {
-  justify-self: start;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   font-family: v.$cp-font-display;
@@ -131,6 +136,10 @@
 
 @media (max-width: v.$cp-breakpoint-md) {
   .cp-workout-toggle {
+    width: 100%;
+  }
+
+  .cp-workout-selector-actions {
     width: 100%;
   }
 

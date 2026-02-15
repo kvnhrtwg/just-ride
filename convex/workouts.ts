@@ -332,6 +332,41 @@ export const getWorkoutSessionForFitExport = query({
   },
 })
 
+export const listPastWorkoutSessions = query({
+  args: {},
+  handler: async (ctx) => {
+    const userSubject = await requireUserSubject(ctx)
+    const sessions = await ctx.db
+      .query('workoutSessions')
+      .withIndex('by_user_started_at', (q) => q.eq('userSubject', userSubject))
+      .collect()
+
+    return sessions
+      .filter((session) => session.status !== 'recording')
+      .sort((left, right) => {
+        const leftSortTime = left.endedAt ?? left.startedAt
+        const rightSortTime = right.endedAt ?? right.startedAt
+        if (leftSortTime !== rightSortTime) {
+          return rightSortTime - leftSortTime
+        }
+        return right.startedAt - left.startedAt
+      })
+      .map((session) => ({
+        _id: session._id,
+        workoutTitle: session.workoutTitle,
+        workoutIntensity: session.workoutIntensity,
+        status: session.status,
+        startedAt: session.startedAt,
+        endedAt: session.endedAt ?? null,
+        elapsedSeconds: session.elapsedSeconds ?? 0,
+        sampleCount: session.sampleCount,
+        averagePowerWatts: session.averagePowerWatts ?? null,
+        averageHeartRateBpm: session.averageHeartRateBpm ?? null,
+        averageCadenceRpm: session.averageCadenceRpm ?? null,
+      }))
+  },
+})
+
 export const discardWorkoutSession = mutation({
   args: {
     sessionId: v.id('workoutSessions'),
