@@ -1,0 +1,158 @@
+@use '../variables' as v;
+
+.cp-workout-detail-view {
+  display: grid;
+  gap: v.$cp-space-6;
+  flex: 1;
+}
+
+.cp-workout-detail-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: v.$cp-space-4;
+  padding: v.$cp-space-4;
+  border: v.$cp-border-thin solid rgba(v.$cp-white, 0.22);
+  background: rgba(v.$cp-white, 0.04);
+}
+
+.cp-workout-detail-title-block {
+  display: grid;
+  gap: v.$cp-space-1;
+
+  h2 {
+    margin: 0;
+    color: v.$cp-text-heading;
+    font-size: 1.5rem;
+    letter-spacing: 0.03em;
+  }
+}
+
+.cp-workout-detail-meta {
+  color: v.$cp-text-secondary;
+  font-size: 0.8125rem;
+}
+
+.cp-workout-detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: v.$cp-space-2;
+}
+
+.cp-workout-detail-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: v.$cp-font-display;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  text-decoration: none;
+  letter-spacing: 0.1em;
+  padding: v.$cp-space-2 v.$cp-space-3;
+  cursor: pointer;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+  }
+}
+
+.cp-workout-detail-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: v.$cp-space-3;
+}
+
+.cp-workout-detail-summary-metric {
+  display: grid;
+  gap: v.$cp-space-1;
+  padding: v.$cp-space-3;
+  border: v.$cp-border-thin solid rgba(v.$cp-white, 0.16);
+  background: rgba(v.$cp-white, 0.03);
+
+  p:last-child {
+    margin: 0;
+    color: v.$cp-text-heading;
+    font-size: 1.125rem;
+    letter-spacing: 0.04em;
+  }
+}
+
+.cp-workout-detail-charts {
+  display: grid;
+  gap: v.$cp-space-4;
+}
+
+.cp-workout-detail-chart {
+  display: grid;
+  gap: v.$cp-space-2;
+  padding: v.$cp-space-3;
+  border: v.$cp-border-thin solid rgba(v.$cp-white, 0.16);
+  background: rgba(v.$cp-white, 0.03);
+}
+
+.cp-workout-detail-chart-header {
+  h3 {
+    margin: 0;
+    color: v.$cp-text-heading;
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+  }
+}
+
+.cp-workout-detail-chart-canvas {
+  position: relative;
+  min-height: 13rem;
+}
+
+.cp-workout-detail-chart-empty {
+  margin: 0;
+  min-height: 13rem;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  color: v.$cp-text-secondary;
+  border: v.$cp-border-thin dashed rgba(v.$cp-white, 0.28);
+  background: rgba(v.$cp-white, 0.03);
+  padding: v.$cp-space-3;
+}
+
+.cp-workout-detail-download-error {
+  margin: 0;
+  color: var(--cp-accent-pink);
+  font-size: 0.8125rem;
+}
+
+.cp-workout-detail-delete-error {
+  margin: 0;
+  color: var(--cp-accent-pink);
+  font-size: 0.8125rem;
+}
+
+.cp-workout-detail-delete-popover {
+  p {
+    margin: 0;
+    color: var(--cp-text-secondary);
+    font-size: 0.8125rem;
+  }
+}
+
+.cp-workout-detail-delete-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: v.$cp-space-2;
+}
+
+@media (max-width: v.$cp-breakpoint-md) {
+  .cp-workout-detail-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .cp-workout-detail-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}

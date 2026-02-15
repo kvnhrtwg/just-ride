@@ -13,6 +13,7 @@ type WorkoutSelectorProps = {
   ergControlAvailable: boolean
   canStartWithoutTrainer: boolean
   onStartWorkout: (workout: WorkoutDefinition) => void
+  onViewPastWorkouts: () => void
 }
 
 const INTENSITY_OPTIONS: WorkoutIntensity[] = ['lit', 'mit', 'hit']
@@ -22,6 +23,7 @@ export function WorkoutSelector({
   ergControlAvailable,
   canStartWithoutTrainer,
   onStartWorkout,
+  onViewPastWorkouts,
 }: WorkoutSelectorProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [selectedIntensity, setSelectedIntensity] = useState<WorkoutIntensity>(
@@ -39,15 +41,24 @@ export function WorkoutSelector({
 
   return (
     <section className="cp-workout-selector">
-      <button
-        type="button"
-        className="cp-btn cp-workout-toggle"
-        onClick={handleToggleSelector}
-        aria-expanded={isOpen}
-        aria-controls="cp-workout-chooser"
-      >
-        Select Workout
-      </button>
+      <div className="cp-workout-selector-actions">
+        <button
+          type="button"
+          className="cp-btn cp-workout-toggle"
+          onClick={handleToggleSelector}
+          aria-expanded={isOpen}
+          aria-controls="cp-workout-chooser"
+        >
+          Select Workout
+        </button>
+        <button
+          type="button"
+          className="cp-btn cp-workout-toggle"
+          onClick={onViewPastWorkouts}
+        >
+          Past Workouts
+        </button>
+      </div>
 
       {isOpen ? (
         <div id="cp-workout-chooser" className="cp-workout-panel">
