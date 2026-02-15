@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react'
 import { ChevronDown, ChevronUp, Play } from 'lucide-react'
 import type { WorkoutDefinition, WorkoutSegment } from '@/workouts/catalog'
+import { getWorkoutZoneColor } from '@/workouts/powerZones'
 import './WorkoutBlockSidebar.scss'
 
 type WorkoutBlockSidebarProps = {
@@ -14,7 +15,6 @@ type WorkoutBlockSidebarProps = {
   onIncreaseIntensity: () => void
 }
 
-type WorkoutZone = 1 | 2 | 3 | 4 | 5 | 6
 type WorkoutBlockState = 'completed' | 'active' | 'upcoming'
 type IntervalLoopIndicatorTarget = 'none' | 'on' | 'off'
 type SingleWorkoutBlockRow = {
@@ -39,15 +39,6 @@ type IntervalLoopWorkoutBlockRow = {
   offBlockStyle: CSSProperties
 }
 type WorkoutBlockRow = SingleWorkoutBlockRow | IntervalLoopWorkoutBlockRow
-
-const ZONE_COLORS: Record<WorkoutZone, string> = {
-  1: '#e0d4f5',
-  2: '#00f0ff',
-  3: '#ffe600',
-  4: '#ff2d95',
-  5: '#ff3b30',
-  6: '#b000ff',
-}
 
 export function WorkoutBlockSidebar({
   workout,
@@ -244,10 +235,10 @@ function buildWorkoutBlockRows({
           indicatorState: states.indicatorState,
           indicatorTarget: states.indicatorTarget,
           onBlockStyle: {
-            '--cp-workout-block-color-solid': getZoneColor(getMidFtp(segment)),
+            '--cp-workout-block-color-solid': getWorkoutZoneColor(getMidFtp(segment)),
           } as CSSProperties,
           offBlockStyle: {
-            '--cp-workout-block-color-solid': getZoneColor(getMidFtp(nextSegment)),
+            '--cp-workout-block-color-solid': getWorkoutZoneColor(getMidFtp(nextSegment)),
           } as CSSProperties,
         })
         index += repeatCount * 2
@@ -268,7 +259,7 @@ function buildWorkoutBlockRows({
       segment,
       state,
       blockStyle: {
-        '--cp-workout-block-color-solid': getZoneColor(getMidFtp(segment)),
+        '--cp-workout-block-color-solid': getWorkoutZoneColor(getMidFtp(segment)),
       } as CSSProperties,
     })
     index += 1
@@ -511,19 +502,6 @@ function getWorkoutBlockState({
 
 function getMidFtp(segment: WorkoutSegment): number {
   return (segment.ftpLow + segment.ftpHigh) / 2
-}
-
-function getZoneFromFtp(ftpRatio: number): WorkoutZone {
-  if (ftpRatio < 0.56) return 1
-  if (ftpRatio < 0.76) return 2
-  if (ftpRatio < 0.91) return 3
-  if (ftpRatio < 1.06) return 4
-  if (ftpRatio < 1.21) return 5
-  return 6
-}
-
-function getZoneColor(ftpRatio: number): string {
-  return ZONE_COLORS[getZoneFromFtp(ftpRatio)]
 }
 
 function clamp(value: number, min: number, max: number): number {

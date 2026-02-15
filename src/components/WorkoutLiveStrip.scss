@@ -7,12 +7,13 @@
 
 .cp-workout-live-block {
   --cp-workout-live-zone-color: v.$cp-white, 0.72;
-  --cp-workout-live-zone-muted-alpha: 75%;
+  --cp-workout-live-zone-muted-alpha: 70%;
   --cp-workout-live-zone-progress: 0%;
   --cp-workout-live-zone-transition: 1000ms;
+  --cp-workout-live-zone-pulse-duration: 1400ms;
 
   position: relative;
-  height: 3rem;
+  height: 3.5rem;
   background: color-mix(
     in srgb,
     var(--cp-workout-live-zone-color) var(--cp-workout-live-zone-muted-alpha),
@@ -35,8 +36,22 @@
     width: var(--cp-workout-live-zone-progress);
     background: var(--cp-workout-live-zone-color);
     transition: width var(--cp-workout-live-zone-transition) linear;
+    animation: cp-workout-live-zone-pulse var(--cp-workout-live-zone-pulse-duration)
+      ease-in-out infinite;
+  }
+}
+
+@keyframes cp-workout-live-zone-pulse {
+  0%,
+  100% {
+    opacity: 0.84;
+    filter: brightness(0.95) saturate(1);
   }
 
+  50% {
+    opacity: 1;
+    filter: brightness(1.08) saturate(1.12);
+  }
 }
 
 .cp-workout-live-block-power,
@@ -45,12 +60,9 @@
   z-index: 1;
   font-family: v.$cp-font-mono;
   text-transform: uppercase;
-  color: rgba(v.$cp-black, 0.9);
+  color: rgba(v.$cp-black, 0.92);
   white-space: nowrap;
-}
-
-.cp-workout-live-block-power, .cp-workout-live-block-remaining  {
-  font-size: 1rem;
+  font-size: 1.25rem;
   font-weight: 600;
   letter-spacing: 0.04em;
 }
@@ -82,7 +94,7 @@
   align-items: baseline;
   gap: 0.25rem;
   font-family: v.$cp-font-mono;
-  font-size: 2rem;
+  font-size: 2.5rem;
   line-height: 0.8;
   justify-content: end;
 }
@@ -92,14 +104,13 @@
   display: inline-flex;
   align-items: center;
   gap: v.$cp-space-1;
-  font-size: 0.75rem;
+  font-size: 1rem;
   line-height: 1;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: v.$cp-text-heading;
   justify-self: end;
 }
-
 
 .cp-workout-live-metric-average-icon,
 .cp-workout-live-metric-average-unit {
@@ -148,5 +159,11 @@
 
   .cp-workout-live-metric {
     justify-items: start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cp-workout-live-block::before {
+    animation: none;
   }
 }

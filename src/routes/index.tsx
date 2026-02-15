@@ -16,6 +16,7 @@ import { WorkoutProgress } from '@/components/WorkoutProgress'
 import { WorkoutBlockSidebar } from '@/components/WorkoutBlockSidebar'
 import { WorkoutTelemetryChart } from '@/components/WorkoutTelemetryChart'
 import { useWorkoutExecution } from '@/hooks/useWorkoutExecution'
+import { useScreenWakeLock } from '@/hooks/useScreenWakeLock'
 import { downloadFitFile } from '@/lib/fit-download'
 import './index.scss'
 
@@ -245,6 +246,9 @@ function Home() {
     start: startWorkout,
     stop: stopWorkout,
   } = workoutExecution
+  const shouldKeepScreenAwake =
+    isWorkoutLifecycleActive && !workoutCompleted
+  useScreenWakeLock(shouldKeepScreenAwake)
   const waitingForFirstPower =
     pendingWorkoutStart !== null && !activeWorkout && !isUsingFakeTelemetry
   const displayedWorkout = activeWorkout ?? pendingWorkoutStart

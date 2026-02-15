@@ -13,7 +13,7 @@
 
 .cp-workout-block-sidebar-list {
   display: grid;
-  gap: v.$cp-space-2;
+  gap: v.$cp-space-1;
   overflow-y: auto;
 }
 
@@ -37,7 +37,7 @@
 }
 
 .cp-workout-block {
-  --cp-workout-block-color-muted-alpha: 60%;
+  --cp-workout-block-color-muted-alpha: 40%;
   --cp-workout-block-color-muted: color-mix(
     in srgb,
     var(--cp-workout-block-color-solid, rgba(v.$cp-white, 0.9))
@@ -54,7 +54,7 @@
   flex: 1;
   background: var(--cp-workout-block-color-muted);
   color: rgba(v.$cp-black, 0.9);
-  padding: 0 v.$cp-space-3;
+  padding: 0 v.$cp-space-1;
   font-weight: 700;
 }
 
@@ -65,7 +65,10 @@
 
 .cp-workout-block--loop {
   display: grid;
-  grid-template-columns: var(--cp-workout-block-loop-repeat-width) minmax(0, 1fr) auto;
+  grid-template-columns: var(--cp-workout-block-loop-repeat-width) minmax(
+      0,
+      1fr
+    ) auto;
   align-items: center;
   gap: v.$cp-space-1;
 }
@@ -73,12 +76,13 @@
 .cp-workout-block-power,
 .cp-workout-block-duration {
   font-family: v.$cp-font-mono;
-  font-weight:600;
+  font-weight: 600;
   font-size: 1rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: rgba(v.$cp-black, 0.92);
+  color: rgba(v.$cp-white, 0.92);
   white-space: nowrap;
+  padding: 0 v.$cp-space-2;
 }
 
 .cp-workout-block-loop-repeat {
@@ -108,10 +112,12 @@
 }
 
 .cp-workout-block--active {
-  background: var(--cp-workout-block-color-solid, rgba(v.$cp-white, 0.9));
-  box-shadow:
-    0 0 0.75rem rgba(0, 240, 255, 0.45),
-    0 0 1.5rem rgba(255, 45, 149, 0.2);
+  background: var(--cp-workout-block-color-solid);
+}
+
+.cp-workout-block--active .cp-workout-block-power,
+.cp-workout-block--active .cp-workout-block-duration {
+  color: rgba(v.$cp-black, 0.92);
 }
 
 .cp-workout-block-active-indicator {
@@ -137,14 +143,24 @@
 .cp-workout-block-active-indicator--loop-on {
   align-self: flex-start;
   margin-top: calc(
-    (var(--cp-workout-block-loop-height) - var(--cp-workout-block-indicator-size)) / 2
+    (
+        var(--cp-workout-block-loop-height) - var(
+            --cp-workout-block-indicator-size
+          )
+      ) /
+      2
   );
 }
 
 .cp-workout-block-active-indicator--loop-off {
   align-self: flex-end;
   margin-bottom: calc(
-    (var(--cp-workout-block-loop-height) - var(--cp-workout-block-indicator-size)) / 2
+    (
+        var(--cp-workout-block-loop-height) - var(
+            --cp-workout-block-indicator-size
+          )
+      ) /
+      2
   );
 }
 
@@ -154,7 +170,9 @@
   justify-content: space-between;
   gap: v.$cp-space-2;
   width: calc(
-    100% - var(--cp-workout-block-indicator-size) - var(--cp-workout-block-row-gap)
+    100% - var(--cp-workout-block-indicator-size) - var(
+        --cp-workout-block-row-gap
+      )
   );
 }
 

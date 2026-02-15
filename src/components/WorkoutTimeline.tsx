@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import type { WorkoutDefinition, WorkoutSegment } from '@/workouts/catalog'
+import { getWorkoutZoneColor, getWorkoutZoneFromFtp } from '@/workouts/powerZones'
 import './WorkoutTimeline.scss'
 
 type WorkoutTimelineProps = {
@@ -10,22 +11,11 @@ type WorkoutTimelineProps = {
   showTimescale?: boolean
 }
 
-type WorkoutZone = 1 | 2 | 3 | 4 | 5 | 6
-
 const WORKOUT_PLOT_WIDTH = 100
 const WORKOUT_PLOT_HEIGHT = 34
 const WORKOUT_PLOT_BASELINE = 32
 const WORKOUT_PLOT_TOP_PADDING = 2
 const WORKOUT_SEGMENT_GAP = 0.18
-
-const ZONE_COLORS: Record<WorkoutZone, string> = {
-  1: '#e0d4f5',
-  2: '#00f0ff',
-  3: '#ffe600',
-  4: '#ff2d95',
-  5: '#ff3b30',
-  6: '#b000ff',
-}
 
 export function WorkoutTimeline({
   workout,
@@ -54,12 +44,14 @@ export function WorkoutTimeline({
   }, [elapsedSeconds, workout.segments, workout.totalDurationSeconds])
 
   const selectedSegment = useMemo(() => {
-    if (interactive && hoveredSegmentId) {
+    if (interactive) {
+      if (!hoveredSegmentId) {
+        return elapsedSegment
+      }
+
       return (
         workout.segments.find((segment) => segment.id === hoveredSegmentId) ??
-        elapsedSegment ??
-        workout.segments[0] ??
-        null
+        elapsedSegment
       )
     }
 
@@ -111,8 +103,8 @@ export function WorkoutTimeline({
                 y1="0%"
                 y2="0%"
               >
-                <stop offset="0%" stopColor={getZoneColor(geometry.segment.ftpLow)} />
-                <stop offset="100%" stopColor={getZoneColor(geometry.segment.ftpHigh)} />
+                <stop offset="0%" stopColor={getWorkoutZoneColor(geometry.segment.ftpLow)} />
+                <stop offset="100%" stopColor={getWorkoutZoneColor(geometry.segment.ftpHigh)} />
               </linearGradient>
             ))}
           </defs>
@@ -179,21 +171,29 @@ export function WorkoutTimeline({
         </div>
       ) : null}
 
-      {selectedSegment ? (
-        <div className="cp-workout-segment-readout">
-          <p className="cp-workout-segment-title">
-            {selectedSegment.label} - {formatDuration(selectedSegment.durationSeconds)}
-          </p>
-          <p className="cp-workout-segment-power">
-            {formatSegmentPower(selectedSegment, ftp)} - Zone {getZoneFromFtp(getMidFtp(selectedSegment))}
-          </p>
-          {clampedElapsed !== null ? (
-            <p className="cp-workout-segment-time">
-              {formatDuration(clampedElapsed)} / {formatDuration(workout.totalDurationSeconds)}
+      <div className="cp-workout-segment-readout">
+        {selectedSegment ? (
+          <>
+            <p className="cp-workout-segment-title">
+              {selectedSegment.label} - {formatDuration(selectedSegment.durationSeconds)}
             </p>
-          ) : null}
-        </div>
-      ) : null}
+            <p className="cp-workout-segment-power">
+              {formatSegmentPower(selectedSegment, ftp)} - Zone{' '}
+              {getWorkoutZoneFromFtp(getMidFtp(selectedSegment))}
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="cp-workout-segment-title">Hover a segment to preview</p>
+            <p className="cp-workout-segment-power">-</p>
+          </>
+        )}
+        {clampedElapsed !== null ? (
+          <p className="cp-workout-segment-time">
+            {formatDuration(clampedElapsed)} / {formatDuration(workout.totalDurationSeconds)}
+          </p>
+        ) : null}
+      </div>
     </section>
   )
 }
@@ -238,19 +238,6 @@ function getElapsedPositionX({
 
 function getMidFtp(segment: WorkoutSegment): number {
   return (segment.ftpLow + segment.ftpHigh) / 2
-}
-
-function getZoneFromFtp(ftpRatio: number): WorkoutZone {
-  if (ftpRatio < 0.56) return 1
-  if (ftpRatio < 0.76) return 2
-  if (ftpRatio < 0.91) return 3
-  if (ftpRatio < 1.06) return 4
-  if (ftpRatio < 1.21) return 5
-  return 6
-}
-
-function getZoneColor(ftpRatio: number): string {
-  return ZONE_COLORS[getZoneFromFtp(ftpRatio)]
 }
 
 function buildSegmentGeometries(workoutId: string, segments: WorkoutSegment[]) {

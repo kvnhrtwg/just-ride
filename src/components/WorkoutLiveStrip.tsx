@@ -2,6 +2,7 @@ import type { CSSProperties } from 'react'
 import type { LucideIcon } from 'lucide-react'
 import { CircleSlash2, HeartPulse, RotateCw, Zap } from 'lucide-react'
 import type { WorkoutDefinition, WorkoutSegment } from '@/workouts/catalog'
+import { getWorkoutZoneColor } from '@/workouts/powerZones'
 import './WorkoutLiveStrip.scss'
 
 type WorkoutLiveStripProps = {
@@ -19,17 +20,6 @@ type WorkoutLiveStripProps = {
   avgCadenceRpm: number | null
   avgHeartRateBpm: number | null
   workoutIntensityPercent: number
-}
-
-type WorkoutZone = 1 | 2 | 3 | 4 | 5 | 6
-
-const ZONE_COLORS: Record<WorkoutZone, string> = {
-  1: '#e0d4f5',
-  2: '#00f0ff',
-  3: '#ffe600',
-  4: '#ff2d95',
-  5: '#ff3b30',
-  6: '#b000ff',
 }
 
 export function WorkoutLiveStrip({
@@ -70,7 +60,7 @@ export function WorkoutLiveStrip({
     isWaitingForStart,
     isCompleted,
   })
-  const zoneColor = getZoneColor(getMidFtp(displaySegment))
+  const zoneColor = getWorkoutZoneColor(getMidFtp(displaySegment))
   const blockStyle = {
     '--cp-workout-live-zone-color': zoneColor,
     '--cp-workout-live-zone-progress': `${(segmentProgress * 100).toFixed(3)}%`,
@@ -295,19 +285,6 @@ function formatRemainingDuration(totalSeconds: number): string {
 
 function getMidFtp(segment: WorkoutSegment): number {
   return (segment.ftpLow + segment.ftpHigh) / 2
-}
-
-function getZoneFromFtp(ftpRatio: number): WorkoutZone {
-  if (ftpRatio < 0.56) return 1
-  if (ftpRatio < 0.76) return 2
-  if (ftpRatio < 0.91) return 3
-  if (ftpRatio < 1.06) return 4
-  if (ftpRatio < 1.21) return 5
-  return 6
-}
-
-function getZoneColor(ftpRatio: number): string {
-  return ZONE_COLORS[getZoneFromFtp(ftpRatio)]
 }
 
 function clamp(value: number, min: number, max: number): number {

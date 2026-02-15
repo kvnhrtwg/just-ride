@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import {
-  getInitialWorkoutIntensity,
   workoutsByIntensity,
   type WorkoutDefinition,
   type WorkoutIntensity,
@@ -26,11 +25,11 @@ export function WorkoutSelector({
   onViewPastWorkouts,
 }: WorkoutSelectorProps) {
   const [isOpen, setIsOpen] = useState(false)
-  const [selectedIntensity, setSelectedIntensity] = useState<WorkoutIntensity>(
-    getInitialWorkoutIntensity(),
+  const [selectedIntensity, setSelectedIntensity] = useState<WorkoutIntensity | null>(
+    null,
   )
 
-  const workouts = workoutsByIntensity[selectedIntensity]
+  const workouts = selectedIntensity ? workoutsByIntensity[selectedIntensity] : []
   const handleToggleSelector = () => {
     setIsOpen((open) => !open)
   }
@@ -86,7 +85,9 @@ export function WorkoutSelector({
             ))}
           </div>
 
-          {workouts.length === 0 ? (
+          {selectedIntensity === null ? (
+            <p className="cp-workout-empty">Select an intensity to view workouts.</p>
+          ) : workouts.length === 0 ? (
             <p className="cp-workout-empty">
               No {selectedIntensity.toUpperCase()} workouts available yet.
             </p>
