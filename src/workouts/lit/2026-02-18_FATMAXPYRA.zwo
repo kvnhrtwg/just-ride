@@ -1,0 +1,41 @@
+<workout_file>
+	<author>Kevin Hartwig (via TrainingPeaks)</author>
+	<name>FATMAX PYRAMIDES // 1:20 H</name>
+	<description>FATMAX: Training am Punkt der maximalen Fettoxidation
+
+Und damit das funktioniert und dein Fettstoffwechsel optimal läuft, ist auch heute die Aufnahme von Kohlenhydraten entscheidend.
+
+Trittfrequenz sollte während der gesamten Einheit zwischen 85 und 95 liegen.
+
+Nimm 0,6g/kg über die gesamte Einheit zu dir.</description>
+	<sportType>bike</sportType>
+	<tags/>
+	<workout>
+		<Warmup Duration="420" PowerHigh="0.6" PowerLow="0.4">
+		</Warmup>
+		<SteadyState Duration="360" Power="0.67">
+		</SteadyState>
+		<SteadyState Duration="360" Power="0.73">
+		</SteadyState>
+		<SteadyState Duration="480" Power="0.76">
+		</SteadyState>
+		<SteadyState Duration="360" Power="0.73">
+		</SteadyState>
+		<SteadyState Duration="360" Power="0.68">
+		</SteadyState>
+		<SteadyState Duration="360" Power="0.6">
+		</SteadyState>
+		<SteadyState Duration="360" Power="0.68">
+		</SteadyState>
+		<SteadyState Duration="360" Power="0.73">
+		</SteadyState>
+		<SteadyState Duration="480" Power="0.76">
+		</SteadyState>
+		<SteadyState Duration="360" Power="0.73">
+		</SteadyState>
+		<SteadyState Duration="360" Power="0.65">
+		</SteadyState>
+		<Cooldown Duration="180" PowerHigh="0.32" PowerLow="0.52">
+		</Cooldown>
+	</workout>
+</workout_file>
