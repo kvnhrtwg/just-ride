@@ -23,6 +23,7 @@ const workoutSampleValidator = v.object({
   elapsedSeconds: v.number(),
   segmentId: v.union(v.string(), v.null()),
   segmentIndex: v.number(),
+  targetWatts: v.optional(v.union(v.number(), v.null())),
   powerWatts: v.union(v.number(), v.null()),
   cadenceRpm: v.union(v.number(), v.null()),
   heartRateBpm: v.union(v.number(), v.null()),
@@ -33,6 +34,7 @@ type WorkoutSample = {
   elapsedSeconds: number
   segmentId: string | null
   segmentIndex: number
+  targetWatts?: number | null
   powerWatts: number | null
   cadenceRpm: number | null
   heartRateBpm: number | null
@@ -69,6 +71,10 @@ function normalizeSample(sample: WorkoutSample): WorkoutSample {
     elapsedSeconds: normalizedElapsed,
     segmentId: sample.segmentId,
     segmentIndex: Math.max(0, Math.round(sample.segmentIndex)),
+    targetWatts:
+      typeof sample.targetWatts === 'number' && Number.isFinite(sample.targetWatts)
+        ? Math.max(0, Math.round(sample.targetWatts))
+        : null,
     powerWatts:
       typeof sample.powerWatts === 'number' && Number.isFinite(sample.powerWatts)
         ? Math.max(0, Math.round(sample.powerWatts))

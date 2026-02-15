@@ -18,6 +18,7 @@ const workoutSampleValidator = v.object({
   elapsedSeconds: v.number(),
   segmentId: v.union(v.string(), v.null()),
   segmentIndex: v.number(),
+  targetWatts: v.optional(v.union(v.number(), v.null())),
   powerWatts: v.union(v.number(), v.null()),
   cadenceRpm: v.union(v.number(), v.null()),
   heartRateBpm: v.union(v.number(), v.null()),

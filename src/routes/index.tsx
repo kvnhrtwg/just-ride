@@ -31,6 +31,7 @@ type RecorderSample = {
   elapsedSeconds: number
   segmentId: string | null
   segmentIndex: number
+  targetWatts: number | null
   powerWatts: number | null
   cadenceRpm: number | null
   heartRateBpm: number | null
@@ -214,6 +215,7 @@ function Home() {
           elapsedSeconds: sample.elapsedSeconds,
           segmentId: sample.segmentId,
           segmentIndex: sample.segmentIndex,
+          targetWatts: sample.targetWatts,
           powerWatts: sample.livePowerWatts,
           cadenceRpm: sample.cadenceRpm,
           heartRateBpm: sample.heartRateBpm,
